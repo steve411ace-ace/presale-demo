@@ -16,6 +16,10 @@ public class PresalesDbContext : DbContext
     public DbSet<FollowUp> FollowUps => Set<FollowUp>();
     public DbSet<ChecklistItem> ChecklistItems => Set<ChecklistItem>();
 
+    public DbSet<SurveyPresentation> SurveyPresentations => Set<SurveyPresentation>();
+    public DbSet<SurveyQuestion> SurveyQuestions => Set<SurveyQuestion>();
+    public DbSet<SurveyResponse> SurveyResponses => Set<SurveyResponse>();
+
     protected override void OnModelCreating(ModelBuilder b)
     {
         b.Entity<CustomerProfile>().HasIndex(p => p.Industry);

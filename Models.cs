@@ -144,3 +144,54 @@ public record FollowUpUpdateDto(string Owner, string Deadline);
 public record ScorecardUpdateDto(int UnderstandCustomer, int RightProblem, int BusinessValue, int HandleObjections, int NextStep);
 public record ActionCreateDto(string Title, string Owner, string Deadline, string Source);
 public record ChecklistToggleDto(bool IsDone);
+
+public class SurveyQuestion
+{
+    public int Id { get; set; }
+    public int SortOrder { get; set; }
+    public string Title { get; set; } = "";
+    public string Hint { get; set; } = "";
+    public string Type { get; set; } = "short_text";
+    public string OptionsJson { get; set; } = "[]";
+    public string FieldsJson { get; set; } = "[]";
+    public string Placeholder { get; set; } = "";
+    public int? MinValue { get; set; }
+    public int? MaxValue { get; set; }
+    public int? ScaleMax { get; set; }
+    public bool Required { get; set; }
+    public bool IsActive { get; set; } = true;
+    public string? MediaUrl { get; set; }
+    public string? MediaType { get; set; }
+}
+public class SurveyResponse
+{
+    public int Id { get; set; }
+    public DateTime SubmittedAt { get; set; } = DateTime.UtcNow;
+    public string ContactName { get; set; } = "";
+    public string ContactEmail { get; set; } = "";
+    public string Role { get; set; } = "";
+    public string CompanyName { get; set; } = "";
+    public string Industry { get; set; } = "";
+    public string EmployeeBucket { get; set; } = "";
+    public string LocationsBucket { get; set; } = "";
+    public string CurrentSystem { get; set; } = "";
+    public string PainPointsJson { get; set; } = "[]";
+    public string ShiftType { get; set; } = "";
+    public string DecisionMaker { get; set; } = "";
+    public string ApplyTimeline { get; set; } = "";
+    public string DemoMustSee { get; set; } = "";
+    public string AnswersJson { get; set; } = "{}";
+    // Snapshot preserves labels/types even after editing or restoring definitions.
+    public string QuestionsJson { get; set; } = "[]";
+    public int? ProfileId { get; set; }
+}
+public record SurveySubmitDto(Dictionary<string, System.Text.Json.JsonElement>? Answers, string? UploadToken);
+public record SurveyField(string Key, string Label, string Type, string Placeholder, bool Required);
+public record SurveyOption(string Text, string? Icon = null);
+
+public class SurveyPresentation
+{
+    public int Id { get; set; }
+    public string? MediaUrl { get; set; } = "/images/onenow-logo.png";
+    public string? MediaType { get; set; } = "image";
+}
