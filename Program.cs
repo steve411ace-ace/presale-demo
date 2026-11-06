@@ -11,7 +11,18 @@ builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(o =>
 });
 var app = builder.Build();
 app.UseDefaultFiles();
+app.Use(async (context, next) => {
+    if (context.Request.Path.StartsWithSegments("/uploads")) {
+        context.Response.Headers["X-Content-Type-Options"] = "nosniff";
+        context.Response.Headers["Content-Security-Policy"] = "default-src 'none'; sandbox";
+        if (context.Request.Path.StartsWithSegments("/uploads/surveys"))
+            context.Response.Headers["Content-Disposition"] = "attachment";
+    }
+    await next();
+});
 app.UseStaticFiles();
+
+SurveyApi.Map(app);
 
 app.MapGet("/api/health", () => new { ok = true, app = "PresalesDemo", time = DateTime.UtcNow });
 
@@ -160,25 +171,7 @@ app.MapPost("/api/profiles", async (ProfileCreateDto dto, PresalesDbContext db) 
     if (string.IsNullOrWhiteSpace(dto.Name)) return Results.BadRequest("Profile name is required.");
     if (await db.Profiles.AnyAsync(x => x.Name.ToLower() == dto.Name.Trim().ToLower())) return Results.Conflict("A profile with this name already exists. Choose a different name or open the existing profile.");
     if (dto.Locations < 0 || dto.EmployeeCount < 0) return Results.BadRequest("Locations and EmployeeCount must be non-negative integers.");
-    var p = new CustomerProfile { Name = dto.Name, Industry = dto.Industry, Locations = dto.Locations, EmployeeCount = dto.EmployeeCount, IsDefault = false, IsDemoSample = false };
-    db.Profiles.Add(p); await db.SaveChangesAsync();
-    // Copy template content from the default profile of this industry.
-    var tpl = await db.Profiles.FirstOrDefaultAsync(x => x.Industry == dto.Industry && x.IsDefault);
-    if (tpl is not null)
-    {
-        foreach (var d in await db.DiscoveryItems.Where(x => x.ProfileId == tpl.Id).ToListAsync()) db.DiscoveryItems.Add(new DiscoveryItem { ProfileId = p.Id, Group = d.Group, Question = d.Question, Answer = d.Answer, SortOrder = d.SortOrder });
-        foreach (var x in await db.Priorities.Where(x => x.ProfileId == tpl.Id).ToListAsync()) db.Priorities.Add(new PriorityItem { ProfileId = p.Id, Rank = x.Rank, Title = x.Title, Description = x.Description });
-        foreach (var x in await db.Scenarios.Where(x => x.ProfileId == tpl.Id).ToListAsync()) db.Scenarios.Add(new Scenario { ProfileId = p.Id, SortOrder = x.SortOrder, Title = x.Title, Pain = x.Pain, Solution = x.Solution, Outcome = x.Outcome, Value = x.Value, ScreenFlow = x.ScreenFlow, StorySteps = x.StorySteps, StoryEdited = x.StoryEdited, BeforeText = x.BeforeText, AfterText = x.AfterText });
-        foreach (var x in await db.FitGapRows.Where(x => x.ProfileId == tpl.Id).ToListAsync()) db.FitGapRows.Add(new FitGapRow { ProfileId = p.Id, Requirement = x.Requirement, Status = x.Status, Note = x.Note, SortOrder = x.SortOrder });
-        // Flow fix: a NEW customer profile must start un-scored (0/100, "Chưa chấm") and without the template's
-        // sample action deadlines — copying the template scorecard made a fresh profile look already scored (e.g. 73/100)
-        // before any demo happened. Template content (Discovery, priorities, scenarios, Fit-Gap) is still copied;
-        // only the score and the template's dated actions/follow-ups are NOT carried over. Duplicate keeps copying
-        // (that route is intentionally a copy of an existing profile).
-        db.Scorecards.Add(new Scorecard { ProfileId = p.Id });
-        foreach (var x in await db.ChecklistItems.Where(x => x.ProfileId == tpl.Id).ToListAsync()) db.ChecklistItems.Add(new ChecklistItem { ProfileId = p.Id, Group = x.Group, Title = x.Title, IsDone = false, IsOneNowMandatory = x.IsOneNowMandatory, SortOrder = x.SortOrder });
-        await db.SaveChangesAsync();
-    }
+    var p = await ProfileFactory.Create(db, dto);
     return Results.Created($"/api/profiles/{p.Id}", p);
 });
 
@@ -432,6 +425,7 @@ try
             : $"{type} NOT NULL DEFAULT ''";
         try { db.Database.ExecuteSqlRaw($"IF COL_LENGTH('{table}', '{col}') IS NULL ALTER TABLE [{table}] ADD [{col}] {definition}"); } catch { }
     }
+    await SurveyApi.Initialize(db);
     SeedDataExtra.Seed(db);
     // Sync ONLY untouched default-profile priorities to the frontend template
     // titles (INDUSTRIES scenarios in wwwroot/index.html). A default whose
