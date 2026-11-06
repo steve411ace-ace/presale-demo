@@ -20,8 +20,19 @@ public class PresalesDbContext : DbContext
     public DbSet<SurveyQuestion> SurveyQuestions => Set<SurveyQuestion>();
     public DbSet<SurveyResponse> SurveyResponses => Set<SurveyResponse>();
 
+    public DbSet<Interaction> Interactions => Set<Interaction>();
+    public DbSet<DemoAppointment> DemoAppointments => Set<DemoAppointment>();
+    public DbSet<Attachment> Attachments => Set<Attachment>();
+
     protected override void OnModelCreating(ModelBuilder b)
     {
+        b.Entity<DemoAppointment>().Property(a => a.ReminderMinutes).HasDefaultValue(60);
+        b.Entity<CustomerProfile>().Property(p => p.Status).HasDefaultValue("DangChuanBi");
+        foreach (var type in new[] { typeof(Interaction), typeof(DemoAppointment), typeof(Attachment) })
+        {
+            b.Entity(type).HasIndex("ProfileId");
+            b.Entity(type).HasOne(typeof(CustomerProfile)).WithMany().HasForeignKey("ProfileId").OnDelete(DeleteBehavior.Cascade);
+        }
         b.Entity<CustomerProfile>().HasIndex(p => p.Industry);
         b.Entity<Scorecard>().HasIndex(s => s.ProfileId).IsUnique();
         foreach (var e in new[] { typeof(DiscoveryItem), typeof(PriorityItem), typeof(Scenario), typeof(FitGapRow), typeof(ActionItem), typeof(FollowUp), typeof(ChecklistItem) })
