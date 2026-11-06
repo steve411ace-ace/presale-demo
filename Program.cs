@@ -47,6 +47,8 @@ app.MapGet("/api/profiles/{id:int}", async (int id, PresalesDbContext db) =>
     return Results.Ok(new
     {
         p.Id, p.Name, p.Industry, p.Locations, p.EmployeeCount, p.IsDefault, p.IsDemoSample,
+        p.AiSuggestionRequested, p.AiSuggestionRequestedAt,
+        p.CompanyResearchRequested, p.CompanyResearchRequestedAt, p.CompanyResearchNote,
         details = new { systemInfo = p.SystemInfo, closingJson = p.ClosingJson, actionPlanJson = p.ActionPlanJson, prioConfirmedJson = p.PrioConfirmedJson, healthCsv = p.HealthCsv, prepCsv = p.PrepCsv, estimatorHead = p.EstimatorHead, estimatorDays = p.EstimatorDays, estimatorPeople = p.EstimatorPeople, payrollDeepAnswer = p.PayrollDeepAnswer },
         discovery = await db.DiscoveryItems.Where(x => x.ProfileId == id).OrderBy(x => x.SortOrder).ToListAsync(),
         priorities = await db.Priorities.Where(x => x.ProfileId == id).OrderBy(x => x.Rank).ToListAsync(),
@@ -57,6 +59,99 @@ app.MapGet("/api/profiles/{id:int}", async (int id, PresalesDbContext db) =>
         followUps = await db.FollowUps.Where(x => x.ProfileId == id).OrderBy(x => x.Id).ToListAsync(),
         checklist = await db.ChecklistItems.Where(x => x.ProfileId == id).OrderBy(x => x.SortOrder).ToListAsync(),
     });
+});
+
+// Slide manifests are stored per profile; images are served by UseStaticFiles.
+app.MapGet("/api/profiles/{id:int}/slides", async (int id, PresalesDbContext db, IWebHostEnvironment env) =>
+{
+    if (!await db.Profiles.AnyAsync(p => p.Id == id)) return Results.NotFound();
+    var path = Path.Combine(env.WebRootPath, "demo-slides", id.ToString(System.Globalization.CultureInfo.InvariantCulture), "slides.json");
+    if (!File.Exists(path)) return Results.Ok(Array.Empty<object>());
+    return Results.Content(await File.ReadAllTextAsync(path), "application/json", Encoding.UTF8);
+});
+
+app.MapPost("/api/profiles/{id:int}/slides", async (int id, HttpRequest request, PresalesDbContext db, IWebHostEnvironment env) =>
+{
+    if (!await db.Profiles.AnyAsync(p => p.Id == id)) return Results.NotFound();
+    System.Text.Json.JsonDocument document;
+    try { document = await System.Text.Json.JsonDocument.ParseAsync(request.Body); }
+    catch (System.Text.Json.JsonException) { return Results.BadRequest("Invalid slide JSON."); }
+    using (document)
+    {
+        var slides = document.RootElement;
+        if (slides.ValueKind != System.Text.Json.JsonValueKind.Array || slides.GetArrayLength() != 3)
+            return Results.BadRequest("Exactly three slide arrays are required.");
+        foreach (var group in slides.EnumerateArray())
+        {
+            if (group.ValueKind != System.Text.Json.JsonValueKind.Array)
+                return Results.BadRequest("Each scenario must contain a slide array.");
+            foreach (var slide in group.EnumerateArray())
+            {
+                if (slide.ValueKind != System.Text.Json.JsonValueKind.Object ||
+                    !slide.TryGetProperty("img", out var img) || img.ValueKind != System.Text.Json.JsonValueKind.String ||
+                    !System.Text.RegularExpressions.Regex.IsMatch(img.GetString()!, @"\A[A-Za-z0-9_-]+\.png\z") ||
+                    !slide.TryGetProperty("cap", out var cap) || cap.ValueKind != System.Text.Json.JsonValueKind.String ||
+                    string.IsNullOrWhiteSpace(cap.GetString()))
+                    return Results.BadRequest("Each slide requires a simple PNG filename and a non-empty caption.");
+            }
+        }
+        var directory = Path.Combine(env.WebRootPath, "demo-slides", id.ToString(System.Globalization.CultureInfo.InvariantCulture));
+        Directory.CreateDirectory(directory);
+        var json = slides.GetRawText();
+        await File.WriteAllTextAsync(Path.Combine(directory, "slides.json"), json);
+        return Results.Content(json, "application/json", Encoding.UTF8);
+    }
+});
+
+// Only mark requests; Muse generates and saves suggestions outside this web app.
+app.MapPost("/api/profiles/{id:int}/request-ai-suggestion", async (int id, PresalesDbContext db) =>
+{
+    var requestedAt = DateTime.UtcNow;
+    await db.Profiles.Where(p => p.Id == id && !p.AiSuggestionRequested)
+        .ExecuteUpdateAsync(updates => updates
+            .SetProperty(p => p.AiSuggestionRequested, true)
+            .SetProperty(p => p.AiSuggestionRequestedAt, (DateTime?)requestedAt));
+    var p = await db.Profiles.AsNoTracking().FirstOrDefaultAsync(p => p.Id == id);
+    if (p is null) return Results.NotFound();
+    return Results.Ok(new { p.Id, p.AiSuggestionRequested, p.AiSuggestionRequestedAt });
+});
+
+app.MapPost("/api/profiles/{id:int}/clear-ai-suggestion", async (int id, PresalesDbContext db) =>
+{
+    var affected = await db.Profiles.Where(p => p.Id == id)
+        .ExecuteUpdateAsync(updates => updates.SetProperty(p => p.AiSuggestionRequested, false));
+    if (affected == 0) return Results.NotFound();
+    return Results.NoContent();
+});
+
+// Only mark requests and store notes; Muse researches outside this web app.
+app.MapPost("/api/profiles/{id:int}/request-company-research", async (int id, PresalesDbContext db) =>
+{
+    var requestedAt = DateTime.UtcNow;
+    await db.Profiles.Where(p => p.Id == id && !p.CompanyResearchRequested)
+        .ExecuteUpdateAsync(updates => updates
+            .SetProperty(p => p.CompanyResearchRequested, true)
+            .SetProperty(p => p.CompanyResearchRequestedAt, (DateTime?)requestedAt));
+    var p = await db.Profiles.AsNoTracking().FirstOrDefaultAsync(p => p.Id == id);
+    if (p is null) return Results.NotFound();
+    return Results.Ok(new { p.Id, p.CompanyResearchRequested, p.CompanyResearchRequestedAt });
+});
+
+app.MapPost("/api/profiles/{id:int}/clear-company-research", async (int id, PresalesDbContext db) =>
+{
+    var affected = await db.Profiles.Where(p => p.Id == id)
+        .ExecuteUpdateAsync(updates => updates.SetProperty(p => p.CompanyResearchRequested, false));
+    if (affected == 0) return Results.NotFound();
+    return Results.NoContent();
+});
+
+app.MapPut("/api/profiles/{id:int}/research-note", async (int id, ResearchNoteDto dto, PresalesDbContext db) =>
+{
+    var note = dto.Note ?? "";
+    var affected = await db.Profiles.Where(p => p.Id == id)
+        .ExecuteUpdateAsync(updates => updates.SetProperty(p => p.CompanyResearchNote, note));
+    if (affected == 0) return Results.NotFound();
+    return Results.Ok(new { id, companyResearchNote = note });
 });
 
 app.MapPost("/api/profiles", async (ProfileCreateDto dto, PresalesDbContext db) =>
@@ -75,10 +170,12 @@ app.MapPost("/api/profiles", async (ProfileCreateDto dto, PresalesDbContext db) 
         foreach (var x in await db.Priorities.Where(x => x.ProfileId == tpl.Id).ToListAsync()) db.Priorities.Add(new PriorityItem { ProfileId = p.Id, Rank = x.Rank, Title = x.Title, Description = x.Description });
         foreach (var x in await db.Scenarios.Where(x => x.ProfileId == tpl.Id).ToListAsync()) db.Scenarios.Add(new Scenario { ProfileId = p.Id, SortOrder = x.SortOrder, Title = x.Title, Pain = x.Pain, Solution = x.Solution, Outcome = x.Outcome, Value = x.Value, ScreenFlow = x.ScreenFlow, StorySteps = x.StorySteps, StoryEdited = x.StoryEdited, BeforeText = x.BeforeText, AfterText = x.AfterText });
         foreach (var x in await db.FitGapRows.Where(x => x.ProfileId == tpl.Id).ToListAsync()) db.FitGapRows.Add(new FitGapRow { ProfileId = p.Id, Requirement = x.Requirement, Status = x.Status, Note = x.Note, SortOrder = x.SortOrder });
-        var sc = await db.Scorecards.FirstOrDefaultAsync(x => x.ProfileId == tpl.Id);
-        if (sc is not null) db.Scorecards.Add(new Scorecard { ProfileId = p.Id, UnderstandCustomer = sc.UnderstandCustomer, RightProblem = sc.RightProblem, BusinessValue = sc.BusinessValue, HandleObjections = sc.HandleObjections, NextStep = sc.NextStep });
-        foreach (var x in await db.Actions.Where(x => x.ProfileId == tpl.Id).ToListAsync()) db.Actions.Add(new ActionItem { ProfileId = p.Id, Title = x.Title, Owner = x.Owner, Deadline = x.Deadline, Source = x.Source });
-        foreach (var x in await db.FollowUps.Where(x => x.ProfileId == tpl.Id).ToListAsync()) db.FollowUps.Add(new FollowUp { ProfileId = p.Id, Title = x.Title, Owner = x.Owner, Deadline = x.Deadline, SourceFitGap = x.SourceFitGap });
+        // Flow fix: a NEW customer profile must start un-scored (0/100, "Chưa chấm") and without the template's
+        // sample action deadlines — copying the template scorecard made a fresh profile look already scored (e.g. 73/100)
+        // before any demo happened. Template content (Discovery, priorities, scenarios, Fit-Gap) is still copied;
+        // only the score and the template's dated actions/follow-ups are NOT carried over. Duplicate keeps copying
+        // (that route is intentionally a copy of an existing profile).
+        db.Scorecards.Add(new Scorecard { ProfileId = p.Id });
         foreach (var x in await db.ChecklistItems.Where(x => x.ProfileId == tpl.Id).ToListAsync()) db.ChecklistItems.Add(new ChecklistItem { ProfileId = p.Id, Group = x.Group, Title = x.Title, IsDone = false, IsOneNowMandatory = x.IsOneNowMandatory, SortOrder = x.SortOrder });
         await db.SaveChangesAsync();
     }
@@ -316,6 +413,9 @@ try
     // Add columns added after the DB was first created, without dropping data.
     var addCols = new (string Table, string Col, string Type)[]
     {
+        ("Profiles", "CompanyResearchRequested", "bit"), ("Profiles", "CompanyResearchRequestedAt", "datetime2"),
+        ("Profiles", "CompanyResearchNote", "nvarchar(max)"),
+        ("Profiles", "AiSuggestionRequested", "bit"), ("Profiles", "AiSuggestionRequestedAt", "datetime2"),
         ("Profiles", "SystemInfo", "nvarchar(max)"), ("Profiles", "ClosingJson", "nvarchar(max)"),
         ("Profiles", "ActionPlanJson", "nvarchar(max)"), ("Profiles", "PrioConfirmedJson", "nvarchar(max)"),
         ("Profiles", "HealthCsv", "nvarchar(max)"), ("Profiles", "PrepCsv", "nvarchar(max)"),
@@ -327,7 +427,10 @@ try
     };
     foreach (var (table, col, type) in addCols)
     {
-        try { db.Database.ExecuteSqlRaw($"IF COL_LENGTH('{table}', '{col}') IS NULL ALTER TABLE [{table}] ADD [{col}] {type} NOT NULL DEFAULT ''"); } catch { }
+        var definition = col is "AiSuggestionRequestedAt" or "CompanyResearchRequestedAt" ? "datetime2 NULL"
+            : col is "AiSuggestionRequested" or "CompanyResearchRequested" ? "bit NOT NULL DEFAULT 0"
+            : $"{type} NOT NULL DEFAULT ''";
+        try { db.Database.ExecuteSqlRaw($"IF COL_LENGTH('{table}', '{col}') IS NULL ALTER TABLE [{table}] ADD [{col}] {definition}"); } catch { }
     }
     SeedDataExtra.Seed(db);
     // Sync ONLY untouched default-profile priorities to the frontend template

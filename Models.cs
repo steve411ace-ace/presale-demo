@@ -24,6 +24,11 @@ public class CustomerProfile
     public string PayrollDeepAnswer { get; set; } = "";
     public bool IsDefault { get; set; }
     public bool IsDemoSample { get; set; } = true;
+    public bool AiSuggestionRequested { get; set; } = false;
+    public DateTime? AiSuggestionRequestedAt { get; set; }
+    public bool CompanyResearchRequested { get; set; } = false;
+    public DateTime? CompanyResearchRequestedAt { get; set; }
+    public string CompanyResearchNote { get; set; } = "";
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 }
@@ -127,6 +132,7 @@ public class ChecklistItem
 
 // DTOs for create/update (keeps API surface small and explicit).
 public record ProfileCreateDto(string Name, string Industry, int Locations, int EmployeeCount);
+public record ResearchNoteDto(string Note);
 public record ProfileUpdateDto(string Name, int Locations, int EmployeeCount);
 public record DiscoveryUpdateDto(string Answer);
 public record FitGapUpdateDto(string Status, string Note, string? Requirement = null, string? FollowOwner = null, string? FollowDue = null);

@@ -51,7 +51,7 @@ button{font:inherit;cursor:pointer}
 .stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px}
 .stat b{font-size:24px;letter-spacing:-.02em;display:block}
 .stat span{font-size:12.5px;color:var(--muted)}
-section.block{margin-top:38px;scroll-margin-top:168px}
+section.block{margin-top:38px;scroll-margin-top:132px}
 .sec-head{display:flex;gap:14px;align-items:flex-start;margin-bottom:16px;flex-wrap:wrap}
 .sec-num{font-family:"IBM Plex Mono",monospace;background:var(--navy-bg);color:#fff;font-size:12px;font-weight:600;padding:5px 9px;border-radius:7px;margin-top:3px}
 html[data-theme="dark"] .sec-num{background:var(--teal);color:#06231b} @media (prefers-color-scheme: dark){html[data-theme="system"] .sec-num{background:var(--teal);color:#06231b}}
@@ -82,6 +82,14 @@ html[data-theme="dark"] .warn{border-color:#5c4a17} @media (prefers-color-scheme
 .card ul{margin:6px 0 0;padding-left:17px}
 .card li{margin:4px 0;color:var(--ink)}
 .card li span{color:var(--muted)}
+#discGrid{align-items:stretch}
+#discGrid > .card{display:flex;flex-direction:column}
+#discGrid .disc-answer{margin-top:auto;padding-top:12px}
+#discGrid .disc-answer label.f{margin-top:0}
+#discGrid .disc-note{display:block;height:63px}
+#prio .prio-desc{display:block;height:63px}
+#estimator .grid3 > div{display:grid;grid-template-rows:minmax(3.1em,auto) auto;align-content:start}
+#estimator .grid3 label.f{margin-top:0}
 .disc-num{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--teal);font-weight:600}
 textarea,input[type=text],input[type=date],select{width:100%;font:inherit;font-size:14px;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:9px;padding:9px 11px}
 textarea{resize:vertical;min-height:56px}
@@ -126,6 +134,10 @@ html[data-theme="dark"] .psov .o b{color:#7db3f5} @media (prefers-color-scheme: 
 .timerbox .cur p{margin:3px 0 0;font-size:13px;opacity:.85}
 .btn{border:0;border-radius:10px;padding:11px 18px;font-weight:700;font-size:14px;background:var(--teal);color:#fff;text-decoration:none;display:inline-block;line-height:1.4}
 .btn:hover{background:var(--teal-dark)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.processing{opacity:.85;cursor:wait}
+.btn.processing::before{content:"";display:inline-block;width:12px;height:12px;box-sizing:border-box;border:2px solid currentColor;border-color:transparent;border-top-color:currentColor;border-radius:50%;margin-right:6px;vertical-align:middle;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 .btn.ghost{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
 .btn.ghost:hover{background:var(--surface2);color:var(--ink)}
 .btn.small{padding:8px 13px;font-size:13px}
@@ -173,6 +185,16 @@ input[type=range]{width:100%;accent-color:var(--teal)}
 .internal{border:1.5px dashed var(--red);border-radius:var(--radius);padding:18px;background:var(--surface)}
 .internal h3{color:var(--red);margin-top:0}
 body.presenting .internal, body.presenting .nopresent{display:none !important}
+body.presenting .nav, body.presenting .hero, body.presenting .foot{display:none !important}
+body.presenting section.block:not(#trinhbay){display:none !important}
+body.presenting #trinhbay .nextstep{display:none !important}
+#presentExit{display:none}
+body.presenting #presentExit{display:inline-block}
+.nav a[href="#trinhbay"]{border-left:1.5px solid var(--line);border-radius:0}
+body.presenting .nav a[href="#checklist"], body.presenting .nav a[href="#health"]{opacity:.45}
+#presentBanner{display:none;position:fixed;right:16px;bottom:16px;z-index:60;background:var(--navy-bg);color:#eef5f8;border:1px solid var(--teal);border-radius:12px;padding:10px 14px;font-size:13px;box-shadow:var(--shadow)}
+body.presenting #presentBanner{display:block}
+#presentBanner button{margin-left:10px}
 .foot{margin-top:44px;border-top:1px solid var(--line);padding-top:18px;font-size:13px;color:var(--muted);display:grid;grid-template-columns:1fr 1fr;gap:16px}
 @media(max-width:960px){
   .industries{grid-template-columns:1fr 1fr}
@@ -258,10 +280,27 @@ html[data-theme="dark"] .btn.ghost:hover{background:#2a3d49;color:#e7eff3}
 .nextstep a{font-weight:700}
 .hint{font-size:12.5px;color:var(--muted)}
 .psov textarea{border:1px dashed var(--line)!important;border-radius:8px!important;padding:8px!important;background:var(--surface2)!important}
+.psov textarea.scen-f{overflow-y:hidden;resize:none}
+#presenterSummary .presenter-scenario{font-size:16px;line-height:1.6;margin:12px 0 24px}
+#presenterSummary .story-step{font-size:16px}
+#presenterSummary .story-step b{font-size:13px}
 .psov textarea:focus{border-style:solid!important;border-color:var(--teal)!important;outline:none}
 .scen-title{cursor:text}
 .dl-item{flex:1 1 300px}
 .dl-item .hint{display:block;margin-top:4px}
+/* OneNow demo slides */
+.demo-slides{margin-top:14px}
+.demo-slides-list{display:flex;gap:12px;overflow-x:auto;padding:8px 0}
+.demo-slide{flex:0 0 200px;max-width:70vw;margin:0}
+.demo-slide button{display:block;width:100%;padding:0;border:1px solid var(--line);border-radius:6px;background:var(--surface);cursor:zoom-in;overflow:hidden}
+.demo-slide img{display:block;width:100%;height:112px;object-fit:contain}
+.demo-slide figcaption{font-size:12px;line-height:1.4;color:var(--muted);margin-top:5px}
+.demo-slide-modal{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.88);padding:48px 20px 20px;display:flex;align-items:center;justify-content:center}
+.demo-slide-modal[hidden]{display:none}
+.demo-slide-modal figure{margin:0;max-width:100%;text-align:center;color:#fff}
+.demo-slide-modal img{display:block;max-width:100%;max-height:calc(100vh - 150px);object-fit:contain;margin:auto}
+.demo-slide-modal figcaption{font-size:14px;margin-top:12px;max-height:60px;overflow:auto}
+.demo-slide-close{position:absolute;top:10px;right:18px;border:0;background:transparent;color:#fff;font-size:36px;cursor:pointer}
 </style>
 <script>try{var _t=localStorage.getItem("onenowPresalesTheme")||"system";if(["light","dark","system"].indexOf(_t)<0)_t="system";document.documentElement.setAttribute("data-theme",_t);}catch(e){}</script>
 </head>
@@ -281,7 +320,42 @@ html[data-theme="dark"] .btn.ghost:hover{background:#2a3d49;color:#e7eff3}
 </div></header>
 
 
-<div class="wrap">  <div class="hero">
+<div id="presentBanner">Đang ở chế độ trình chiếu — chỉ hiện phần demo full, toàn bộ mục nhập liệu đã ẩn, không nhập gì trong lúc demo. <button class="btn small" type="button" onclick="document.body.classList.remove('presenting');var pt=document.getElementById('presentToggle');if(pt)pt.textContent='Vào chế độ trình chiếu';">Thoát trình chiếu</button></div>
+<div class="wrap">
+  <!-- 1. INDUSTRY -->
+  <section class="block" id="nganh">
+    <div class="sec-head"><span class="sec-num">01</span><div><h2>Chọn nhóm khách hàng trước</h2><p>Bốn nhóm ngành đầu tiên. Đổi nhóm là đổi toàn bộ kịch bản mẫu, gợi ý Discovery và mục Fit–Gap bên dưới — thông tin khách đã nhập ở form Discovery được giữ nguyên.</p></div></div>
+    <div class="industries" id="industries"></div>
+    <div class="card nopresent" style="margin-top:12px" id="profileCard">
+      <h3>Hồ sơ khách hàng — nhân bản mẫu ngành thành hồ sơ riêng</h3>
+      <p style="margin-top:0">Tạo hồ sơ từ ngành đang chọn: hồ sơ có bản sao riêng của 3 vấn đề ưu tiên, 3 bài toán, ghi chú Discovery và Fit–Gap. Sửa trên hồ sơ <b>không</b> làm thay đổi mẫu gốc của ngành — quay lại “Mẫu ngành gốc” là thấy mẫu nguyên vẹn.</p>
+      <div class="grid3">
+        <div><label class="f" for="profName">Tên khách hàng</label><input type="text" id="profName" placeholder="VD: Tên khách hàng demo"></div>
+        <div><label class="f" for="profLoc">Số cửa hàng / địa điểm / nhà máy</label><input type="text" id="profLoc" inputmode="numeric" placeholder="VD: 12"></div>
+        <div><label class="f" for="profHead">Số nhân viên</label><input type="text" id="profHead" inputmode="numeric" placeholder="VD: 850"></div>
+      </div>
+      <div class="profilebar">
+        <select id="profSelect" aria-label="Chọn hồ sơ khách hàng"></select>
+        <button class="btn small" id="profCreate">Tạo hồ sơ từ ngành đang chọn</button>
+        <button class="btn ghost small" id="profClone">Nhân bản hồ sơ đang mở</button>
+        <button class="btn ghost small" id="profDelete">Xoá hồ sơ đang mở</button>
+        <button class="btn small" id="profRequestAi">Tìm thông tin &amp; gợi ý AI</button>
+        <button class="btn ghost small" id="profMaster">Về mẫu ngành gốc</button>
+      </div>
+      <p class="hint" id="flowStatus" aria-live="polite"></p>
+      <p class="hint" id="researchNote" style="display:none"></p>
+      <p class="sess-note" id="profStatus">Đang xem: <b>Mẫu ngành gốc</b>.</p>
+      <p class="hint">Nhập tên, số địa điểm, số nhân viên một lần ở đây. Mục Discovery chỉ hiện thông tin này cho xem; muốn đổi tên hay quy mô thì sửa ở đây.</p>
+      
+    </div>
+    <div class="ind-banner" id="indBanner"></div>
+    <p class="hint" style="margin-top:8px"><b>Cách dùng:</b> Bấm vào 1 thẻ ngành là đổi toàn bộ nội dung bên dưới — không cần bấm Lưu riêng. Thông tin ngành dưới đây là gợi ý sẵn, sửa được, không phải dữ liệu khách thật.</p>
+    <div id="indDetail"></div>
+    <div class="warn"><b>Lưu ý dữ liệu demo:</b> Chỉ demo trên <b>công ty demo sạch, riêng biệt</b> với dữ liệu giả lập (ví dụ mẫu của Playbook: doanh nghiệp 3.000 nhân viên, nhiều chi nhánh, đang tổng hợp công thủ công, C&amp;B mất 4 ngày xử lý và đối chiếu lương). <b>Không</b> mở công ty đang chứa dữ liệu test nội bộ trước khách. Đặc thù từng ngành dưới đây là giả định dựng demo — phải kiểm chứng lại ở bước Discovery trước buổi demo thật.</div>
+    <div class="nextstep"><b>Bước tiếp theo →</b> <a href="#discovery">Bước 2 · Discovery</a> — tạo/sửa hồ sơ khách ở trên, rồi ghi câu trả lời 8 nhóm và chốt 3 ưu tiên.</div>
+  </section>
+
+  <div class="hero">
     <h1>Demo OneNow theo <em>bài toán của khách</em>, không demo theo menu phần mềm.</h1>
     <p class="lead">Một buổi demo tốt giúp khách tự trả lời 4 câu hỏi: <b style="color:var(--ink)">Có hiểu tôi không? Có giải quyết được không? Có triển khai được không? Có đáng mua không?</b> Chọn nhóm khách hàng trước — kịch bản, câu hỏi Discovery và 3 bài toán trọng tâm sẽ đổi theo ngành.</p>
     <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:12px"><a class="btn" href="#kichban">Xem kịch bản mẫu ngay →</a><a class="btn ghost" href="#trinhbay">Vào trình bày 60 phút →</a></div><div style="font-size:13px;color:var(--muted);margin-top:8px">Không cần tạo hồ sơ trước: chọn ngành là có sẵn kịch bản mẫu, sửa sau cũng được.</div>
@@ -302,43 +376,13 @@ html[data-theme="dark"] .btn.ghost:hover{background:#2a3d49;color:#e7eff3}
     <p style="font-size:12.5px;color:var(--muted);margin:10px 2px 0">Nền tảng: ASP.NET Core 8 + React + SQL Server trên Windows/IIS · Truy cập tại onenow.ezhrsolution.com · Giá, timeline triển khai và liên hệ: theo đề xuất thương mại riêng — thuyết minh sản phẩm không công bố, không tự điền số.</p>
   </div>
 
-  <!-- 1. INDUSTRY -->
-  <section class="block" id="nganh">
-    <div class="sec-head"><span class="sec-num">01</span><div><h2>Chọn nhóm khách hàng trước</h2><p>Bốn nhóm ngành đầu tiên. Đổi nhóm là đổi toàn bộ kịch bản mẫu, gợi ý Discovery và mục Fit–Gap bên dưới — thông tin khách đã nhập ở form Discovery được giữ nguyên.</p></div></div>
-    <div class="industries" id="industries"></div>
-    <div class="ind-banner" id="indBanner"></div>
-    <p class="hint" style="margin-top:8px"><b>Cách dùng:</b> Bấm vào 1 thẻ ngành là đổi toàn bộ nội dung bên dưới — không cần bấm Lưu riêng. Thông tin ngành dưới đây là gợi ý sẵn, sửa được, không phải dữ liệu khách thật.</p>
-    <div id="indDetail"></div>
-    <div class="warn"><b>Lưu ý dữ liệu demo:</b> Chỉ demo trên <b>công ty demo sạch, riêng biệt</b> với dữ liệu giả lập (ví dụ mẫu của Playbook: doanh nghiệp 3.000 nhân viên, nhiều chi nhánh, đang tổng hợp công thủ công, C&amp;B mất 4 ngày xử lý và đối chiếu lương). <b>Không</b> mở công ty đang chứa dữ liệu test nội bộ trước khách. Đặc thù từng ngành dưới đây là giả định dựng demo — phải kiểm chứng lại ở bước Discovery trước buổi demo thật.</div>
-    <div class="card nopresent" style="margin-top:12px" id="profileCard">
-      <h3>Hồ sơ khách hàng — nhân bản mẫu ngành thành hồ sơ riêng</h3>
-      <p style="margin-top:0">Tạo hồ sơ từ ngành đang chọn: hồ sơ có bản sao riêng của 3 vấn đề ưu tiên, 3 bài toán, ghi chú Discovery và Fit–Gap. Sửa trên hồ sơ <b>không</b> làm thay đổi mẫu gốc của ngành — quay lại “Mẫu ngành gốc” là thấy mẫu nguyên vẹn.</p>
-      <div class="grid3">
-        <div><label class="f" for="profName">Tên khách hàng</label><input type="text" id="profName" placeholder="VD: Tên khách hàng demo"></div>
-        <div><label class="f" for="profLoc">Số cửa hàng / địa điểm / nhà máy</label><input type="text" id="profLoc" inputmode="numeric" placeholder="VD: 12"></div>
-        <div><label class="f" for="profHead">Số nhân viên</label><input type="text" id="profHead" inputmode="numeric" placeholder="VD: 850"></div>
-      </div>
-      <div class="profilebar">
-        <select id="profSelect" aria-label="Chọn hồ sơ khách hàng"></select>
-        <button class="btn small" id="profCreate">Tạo hồ sơ từ ngành đang chọn</button>
-        <button class="btn ghost small" id="profClone">Nhân bản hồ sơ đang mở</button>
-        <button class="btn ghost small" id="profDelete">Xoá hồ sơ đang mở</button>
-        <button class="btn ghost small" id="profMaster">Về mẫu ngành gốc</button>
-      </div>
-      <p class="sess-note" id="profStatus">Đang xem: <b>Mẫu ngành gốc</b>.</p>
-      <p class="hint"><b>Nhập một lần ở đây là chính.</b> Tên ở Discovery sẽ tự đồng bộ sang hồ sơ này, không cần nhập lại 2 lần. Nếu thấy tên khác nhau, sửa ở đây (hồ sơ) là đúng.</p>
-      
-    </div>
-    <div class="nextstep"><b>Bước tiếp theo →</b> <a href="#discovery">Bước 2 · Discovery</a> — tạo/sửa hồ sơ khách ở trên, rồi ghi câu trả lời 8 nhóm và chốt 3 ưu tiên.</div>
-  </section>
-
   <!-- 2. DISCOVERY -->
   <section class="block" id="discovery">
     <div class="sec-head"><span class="sec-num">02</span><div><h2>Hồ sơ khách hàng &amp; Discovery</h2><p>Buổi Pre-demo Discovery 15–30 phút với đủ 8 nhóm câu hỏi của Playbook. Chưa chốt được 3 vấn đề ưu tiên thì chưa dựng kịch bản.</p></div></div>
     <div class="card">
       <div class="grid3">
-        <div><label class="f" for="cName">Tên khách hàng / doanh nghiệp</label><input type="text" id="cName" placeholder="VD: Tên doanh nghiệp khách hàng"></div>
-        <div><label class="f" for="cScale">Quy mô nhân sự</label><input type="text" id="cScale" placeholder="VD: 850 nhân viên, 3 địa điểm"></div>
+        <div><label class="f" for="cName">Tên khách hàng / doanh nghiệp</label><output id="cName">— chưa nhập —</output></div>
+        <div><label class="f" for="cScale">Quy mô nhân sự</label><output id="cScale">— chưa nhập —</output></div>
         <div><label class="f" for="cSys">Hệ thống / cách làm hiện tại</label><input type="text" id="cSys" placeholder="VD: Excel + máy chấm công rời rạc"></div>
       </div>
     </div>
@@ -349,7 +393,7 @@ html[data-theme="dark"] .btn.ghost:hover{background:#2a3d49;color:#e7eff3}
       <label class="f" for="payrollDeepNote">Ghi câu trả lời của khách về lương (lưu theo hồ sơ, tải lại trang vẫn còn)</label>
       <textarea id="payrollDeepNote" placeholder="Ghi ngắn gọn, đúng lời khách về lương…"></textarea>
     </div>
-    <p style="font-size:12.5px;color:var(--muted);margin:10px 0 0"><b>Một chỗ nhập chính:</b> tên khách, số địa điểm, số nhân viên nhập ở mục Hồ sơ khách hàng là chính — ô tên ở đây đồng bộ hai chiều với hồ sơ, ô quy mô hiển thị từ hồ sơ và khi sửa số ở đây cũng đổi hồ sơ, ô hệ thống hiện tại lưu theo hồ sơ. Số nhân viên ở máy tính ước lượng đã tự điền từ hồ sơ; sửa ở đó chỉ dùng cho ước lượng, không đổi hồ sơ.</p>
+    <p style="font-size:12.5px;color:var(--muted);margin:10px 0 0">Tên khách và quy mô chỉ nhập ở mục Hồ sơ khách hàng phía trên, ở đây chỉ hiện cho xem. Ô hệ thống hiện tại và các câu hỏi Discovery vẫn nhập ở đây sau khi đã tạo hồ sơ.</p>
     <div class="prio" id="prio"></div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px" class="nopresent">
       <button class="btn ghost small" id="resetPrio">Khôi phục ưu tiên gốc của ngành</button>
@@ -383,7 +427,7 @@ html[data-theme="dark"] .btn.ghost:hover{background:#2a3d49;color:#e7eff3}
   <section class="block" id="kichban">
     <div class="sec-head"><span class="sec-num">04</span><div><h2>Demo Builder — đúng 3 bài toán trọng tâm</h2><p>Mỗi bài toán bắt buộc đủ 4 ô: Vấn đề – Xử lý – Kết quả – Giá trị. Thao tác nào không gắn với vấn đề và giá trị thì không đưa vào kịch bản. Cả 3 bài đều dùng các luồng OneNow đã kiểm chứng chạy được: Dashboard, ESS nộp phiếu, Approvals duyệt, số dư phép biến động đúng, trạng thái Applied sau duyệt giải trình công.</p></div>
     <div class="spacer"></div>
-    <button class="btn ghost small nopresent" id="presentToggle">Vào chế độ trình chiếu</button><span class="hint" style="margin-left:8px">Vào chế độ trình chiếu: ẩn checklist, sức khỏe và nội bộ, cuộn xuống mục 11 Trình bày. Bấm lại nút này để thoát — không cần tìm nút ở mục trình bày.</span></div>
+    <button class="btn nopresent" id="presentToggle">Vào chế độ trình chiếu</button><span class="hint" style="margin-left:8px">Vào chế độ trình chiếu: chỉ hiện phần demo full ở mục 11, ẩn toàn bộ mục nhập liệu — trong lúc demo không nhập gì. Bấm lại nút này, nút ở góc dưới, hoặc nút trong mục 11 để thoát.</span></div>
     <div id="scenarios" style="display:grid;gap:14px"></div>
     <div id="storyWrap" style="display:grid;gap:14px;margin-top:14px"></div>
     <div id="compareWrap" style="display:grid;gap:14px;margin-top:14px"></div>
@@ -492,7 +536,8 @@ html[data-theme="dark"] .btn.ghost:hover{background:#2a3d49;color:#e7eff3}
   <!-- 11. PRESENT -->
   <section class="block" id="trinhbay">
     <div class="sec-head"><span class="sec-num">11</span><div><h2>Chế độ trình bày — agenda 60 phút</h2><p>Đúng khung Playbook. Bấm vào từng chặng để nhảy đồng hồ tới chặng đó. Trong 30 phút demo, mỗi bài toán 10 phút: 2′ vấn đề · 5′ thao tác · 2′ kết quả &amp; giá trị · 1′ câu hỏi chốt.</p></div></div>
-        <p class="hint"><b>Đây là bản tổng hợp cuối luồng, không phải nơi nhập dữ liệu.</b> Muốn sửa, quay lên mục tương ứng (ngành, Discovery, kịch bản, Fit–Gap, chấm điểm, bước tiếp) — tổng hợp ở dưới sẽ tự cập nhật. Vào chế độ trình chiếu bằng nút ở mục 04, bấm lại nút đó để thoát.</p>
+        <p class="hint"><b>Đây là demo full, không phải nơi nhập dữ liệu — trong lúc demo không nhập gì.</b> Chỉ xem agenda, đồng hồ, lời thoại và tổng hợp. Muốn sửa, thoát trình chiếu rồi quay lên mục tương ứng (ngành, Discovery, kịch bản, Fit–Gap, chấm điểm, bước tiếp) — tổng hợp ở dưới sẽ tự cập nhật. Vào chế độ trình chiếu bằng nút ở mục 04.</p>
+        <button class="btn" id="presentExit" type="button" onclick="document.body.classList.remove('presenting');var pt=document.getElementById('presentToggle');if(pt)pt.textContent='Vào chế độ trình chiếu';window.scrollTo({top:0,behavior:'smooth'});">Thoát trình chiếu — về chuẩn bị</button>
     <div class="card" id="presenterSummary" style="margin-bottom:14px"><p style="margin:0;color:var(--muted)">Đang tổng hợp dữ liệu đã nhập phía trên…</p></div>
     <div class="agenda" id="agenda"></div>
     <div class="timerbox">
@@ -505,8 +550,8 @@ html[data-theme="dark"] .btn.ghost:hover{background:#2a3d49;color:#e7eff3}
       </div>
     </div>
     <div class="talkbox" id="talkTrack"></div>
-    <div class="card" style="margin-top:12px"><h3>Câu hỏi chốt sau mỗi bài toán — bắt buộc, không bỏ qua</h3><p style="font-size:15px;color:var(--ink);margin:0">“Với cách xử lý vừa trình bày, anh/chị thấy đã phù hợp với quy trình hiện tại chưa — có điểm nào bắt buộc phải khác đi không?”</p><p>Ghi câu trả lời vào mục Fit–Gap ngay, đừng để tới cuối buổi mới nhớ lại.</p></div>
-    <div class="nextstep"><b>Bước tiếp theo →</b> <a href="#advance">Bước 10 · Bước tiếp</a> — nếu chưa tải file: quay lại mục 10 để tải 6 file. Muốn sửa dữ liệu, quay lên mục tương ứng — tổng hợp ở đây sẽ tự cập nhật.</div>
+    <div class="card" style="margin-top:12px"><h3>Câu hỏi chốt sau mỗi bài toán — bắt buộc, không bỏ qua</h3><ol id="presenterCloseQuestions" style="font-size:16px;color:var(--ink);margin:0;padding-left:24px"></ol><p>Ghi câu trả lời vào mục Fit–Gap ngay, đừng để tới cuối buổi mới nhớ lại.</p></div>
+    <div class="nextstep"><b>Sau khi demo xong →</b> Thoát trình chiếu, rồi ghi lại theo thứ tự: <a href="#fitgap">mục 7 · Fit–Gap</a> → <a href="#score">mục 9 · Chấm điểm</a> → <a href="#advance">mục 10 · Bước tiếp</a> để tải 6 file. Muốn sửa dữ liệu, quay lên mục tương ứng — tổng hợp ở đây sẽ tự cập nhật.</div>
   </section>
 
 
@@ -516,32 +561,104 @@ html[data-theme="dark"] .btn.ghost:hover{background:#2a3d49;color:#e7eff3}
   </div>
 </div>
 
+<div id="demoSlideModal" class="demo-slide-modal" role="dialog" aria-modal="true" aria-label="Ảnh demo từ OneNow" aria-describedby="demoSlideCaption" hidden onclick="if(event.target===this) closeDemoSlide()">
+  <button type="button" class="demo-slide-close" aria-label="Đóng ảnh demo" onclick="closeDemoSlide()">×</button>
+  <figure><img id="demoSlideImage" alt=""><figcaption id="demoSlideCaption"></figcaption></figure>
+</div>
+
 <script>
+var demoSlidesByProfile = {};
+var demoSlidesRequests = {};
+function loadDemoSlides(profileId){
+  var request=apiFetch("/api/profiles/"+profileId+"/slides");
+  demoSlidesRequests[profileId]=request;
+  request.catch(function(){ return []; }).then(function(slides){
+    if(demoSlidesRequests[profileId]!==request) return;
+    demoSlidesByProfile[profileId]=Array.isArray(slides) ? slides : [];
+    var profile=activeProfile();
+    if(profile && profile._serverId===profileId){
+      renderCompare(true);
+      renderPresenterSummary(true);
+    }
+  });
+}
+function refreshDemoSlideSlots(box){
+  box.querySelectorAll("[data-demo-slide-index]").forEach(function(slot){
+    slot.innerHTML=renderDemoSlides(Number(slot.getAttribute("data-demo-slide-index")));
+  });
+}
+function demoSlideSlot(index){
+  return '<div data-demo-slide-index="'+index+'">'+renderDemoSlides(index)+'</div>';
+}
+
+function renderDemoSlides(scenarioIndex){
+  var profile=activeProfile();
+  var slides=profile && demoSlidesByProfile[profile._serverId];
+  slides=slides && slides[scenarioIndex];
+  if(!Array.isArray(slides) || !slides.length) return "";
+  return '<div class="demo-slides"><b>Ảnh demo từ OneNow</b><div class="demo-slides-list">'+slides.map(function(slide){
+    var src="/demo-slides/"+profile._serverId+"/"+slide.img;
+    return '<figure class="demo-slide"><button type="button" onclick="openDemoSlide(this)"><img src="'+escHtml(src)+'" alt="'+escHtml(slide.cap)+'" onerror="this.closest(\'.demo-slide\').hidden=true"></button><figcaption>'+escHtml(slide.cap)+'</figcaption></figure>';
+  }).join("")+'</div></div>';
+}
+var demoSlideTrigger=null;
+function openDemoSlide(button){
+  var thumbnail=button.querySelector("img"), modal=document.getElementById("demoSlideModal");
+  var image=document.getElementById("demoSlideImage");
+  image.src=thumbnail.getAttribute("src");
+  image.alt=thumbnail.alt;
+  document.getElementById("demoSlideCaption").textContent=thumbnail.alt;
+  demoSlideTrigger=button;
+  modal.hidden=false;
+  modal.querySelector("button").focus();
+}
+function closeDemoSlide(){
+  document.getElementById("demoSlideModal").hidden=true;
+  if(demoSlideTrigger && demoSlideTrigger.isConnected) demoSlideTrigger.focus();
+  demoSlideTrigger=null;
+}
+document.addEventListener("keydown",function(event){
+  var modal=document.getElementById("demoSlideModal");
+  if(modal.hidden) return;
+  if(event.key==="Escape") closeDemoSlide();
+  else if(event.key==="Tab"){ event.preventDefault(); modal.querySelector("button").focus(); }
+});
+
 var INDUSTRIES = {
   logistics: {
     name:"Logistic", sub:"Kho vận · Giao nhận · Đội xe",
     desc:"Nhiều điểm kho và điểm giao nhận phân tán, ca đêm, tăng ca và phụ cấp di chuyển — công về trung tâm chậm và lệch là nỗi đau số một.",
     traits:["Nhiều điểm kho / điểm giao nhận, dữ liệu công phân tán","Ca đêm, tăng ca và phụ cấp di chuyển theo chuyến","Đội tài xế và nhân viên kho luân chuyển giữa các điểm","Ban Giám đốc cần số liệu công – lương tập trung theo điểm"],
     discHint:"Hỏi sâu: công ở từng kho đang gửi về bằng cách nào, mất bao lâu; phụ cấp di chuyển và tăng ca ca đêm đang tính tay ở đâu.",
+    priorities:[{"id": 1, "title": "Công từ nhiều điểm tập trung & xử lý thiếu log", "description": "Công từ 3 kho và các điểm giao nhận tập trung về một nơi, thiếu log và ca bất thường được phát hiện trong ngày; giải trình có người duyệt và dấu vết, không sửa tay trong bảng công."}, {"id": 2, "title": "Ca đêm & tăng ca được tổng hợp, đối chiếu trước lương", "description": "Ca đêm, tăng ca và phụ cấp theo tuyến được tổng hợp và đối chiếu trước kỳ lương trên công thức 23 thành phần; sai lệch thấy rõ theo từng người trước khi chốt."}, {"id": 3, "title": "C&B kiểm tra lương, phụ cấp & sai lệch trước khi chốt", "description": "C&B kiểm tra chi tiết lương, phụ cấp và sai lệch trên dữ liệu đã duyệt trước khi chốt; phiếu lương chỉ phát hành khi dữ liệu đã sạch, không sửa sau khi trả."}],
     scenarios:[
       {t:"Công từ nhiều điểm tập trung & xử lý thiếu log", mins:"Bài 1 · 10 phút",
-       pain:"Công từ nhiều kho và điểm giao nhận tổng hợp thủ công về trung tâm: chậm, sót log, HR không kiểm soát được ca bất thường và thiếu log ra/vào.",
-       sol:"Mở Dashboard xem phiếu chờ duyệt và phiếu quá hạn SLA, mở phiếu giải trình công trong Approvals, duyệt — hệ thống ghi trạng thái Applied và bổ sung lượt chấm công có dấu vết.",
-       out:"Ca thiếu log được xử lý đúng quy trình duyệt, truy vết được ai duyệt, khi nào, thay vì sửa tay trực tiếp trong bảng công.",
-       val:"HR kiểm soát được bất thường theo từng điểm; dữ liệu công về trung tâm nhất quán để tính lương.",
-       flow:["Dashboard","Approvals · Giải trình công","Duyệt → Applied","Kết quả chấm công"]},
+       pain:"Công từ 3 kho và các điểm giao nhận gom về trung tâm bằng file Excel, thường chậm 1–2 ngày. Tài xế giao muộn hay quên log ra, ca bất thường không ai thấy sớm; đến cuối tháng HR mới phát hiện thiếu log, phải gọi từng kho xác minh rồi sửa tay trong bảng công.",
+       sol:"Mở Dashboard OneNow để xem toàn bộ phiếu chờ duyệt và phiếu quá hạn SLA theo từng kho, thay vì chờ file gửi về. Mở phiếu giải trình công của tài xế giao muộn trong Approvals, kiểm tra log ra/vào rồi duyệt — hệ thống ghi trạng thái Applied và bổ sung lượt chấm công có dấu vết, không sửa tay. Xem lại kết quả chấm công để chắc ca bất thường đã xử lý xong trong ngày.",
+       out:"Thiếu log được phát hiện và xử lý trong ngày, mỗi trường hợp đều có người duyệt và dấu vết rõ ràng; bảng công cuối tháng lấy từ dữ liệu đã duyệt, không còn sửa tay.",
+       val:"HR không còn mất cuối tháng để gom công 3 kho và đối chiếu tay; tranh cãi về công tài xế và kho giảm vì mọi ca bất thường đều có người duyệt và log đầy đủ.",
+       flow:["Dashboard","Approvals · Giải trình công","Duyệt → Applied","Kết quả chấm công"],
+       _story:"Mở đầu: Anh chị đang mất bao nhiêu ngày để gom công 3 kho về trung tâm, và thiếu log thường phát hiện lúc nào?|Mở Dashboard, chỉ phiếu chờ duyệt và phiếu quá hạn SLA theo từng kho|Mở phiếu giải trình công của một tài xế giao muộn, kiểm tra log ra/vào|Duyệt và chỉ trạng thái Applied cùng lượt chấm công đã bổ sung có dấu vết|Hỏi chốt: Với cách này, quy trình giải trình công của anh chị có điểm nào bắt buộc khác đi không?",
+       _before:"Trước: mỗi kho gửi file riêng, công về chậm 1–2 ngày; thiếu log chỉ phát hiện cuối tháng, HR phải gọi từng kho xác minh rồi sửa tay trong bảng công, không có dấu vết ai sửa.",
+       _after:"Sau: công tập trung trên Dashboard, thiếu log hiện ngay trong ngày; giải trình có người duyệt, trạng thái Applied rõ ràng, lượt chấm công bổ sung có dấu vết đầy đủ."},
       {t:"Ca đêm & tăng ca được tổng hợp, đối chiếu trước lương", mins:"Bài 2 · 10 phút",
-       pain:"Ca đêm và tăng ca ở kho tính rải rác theo từng điểm, C&B phải đối chiếu lại toàn bộ trước kỳ lương nên sai lệch dồn vào cuối kỳ.",
-       sol:"Tổng hợp kết quả chấm công và tăng ca đã duyệt theo điểm kho, đối chiếu danh sách ca đêm / tăng ca bất thường ngay trên hệ thống trước khi đưa vào lương.",
-       out:"Danh sách ca đêm và tăng ca đã được duyệt, có căn cứ chấm công rõ ràng, sẵn sàng cho kỳ lương.",
-       val:"Giảm đối chiếu thủ công cuối kỳ; tranh chấp tăng ca có dữ liệu chấm công làm bằng chứng.",
-       flow:["Kết quả chấm công","Tăng ca đã duyệt","Đối chiếu bất thường","Đưa vào kỳ lương"]},
+       pain:"Ca đêm và tăng ca của tài xế, nhân viên kho đang tính tay theo từng tuyến, mỗi tuyến một mức phụ cấp khác nhau. Nhầm một mức phụ cấp hay một giờ tăng ca là cả tháng phải đối chiếu lại, nhân viên khiếu nại kéo dài.",
+       sol:"Mở kết quả chấm công theo ca đêm và tăng ca của một tài xế, đối chiếu giờ tăng ca với phụ cấp theo tuyến ngay trên màn hình. Đưa công và phụ cấp vào công thức lương 23 thành phần để kiểm tra trước khi chốt, sai lệch thấy rõ theo từng người chứ không phải mò trong bảng tính.",
+       out:"Ca đêm, tăng ca và phụ cấp được đối chiếu trước kỳ lương; sai lệch hiện rõ theo từng người, C&B sửa trước khi chốt thay vì sửa sau khi trả.",
+       val:"C&B bớt hẳn thời gian đối chiếu tay cuối tháng; khiếu nại về phụ cấp ca đêm và tăng ca giảm vì mọi mức phụ cấp đều gắn với ca và tuyến, kiểm tra được.",
+       flow:["Kết quả chấm công","Tăng ca đã duyệt","Đối chiếu bất thường","Đưa vào kỳ lương"],
+       _story:"Mở đầu: Phụ cấp ca đêm hiện tính theo tuyến hay tính chung một mức cho mọi tuyến?|Mở kết quả chấm công ca đêm của một tài xế, chỉ giờ tăng ca|Chỉ phụ cấp theo tuyến và cách đối chiếu với giờ tăng ca|Chạy kiểm tra lương cho phạm vi demo nhỏ, chỉ một trường hợp sai lệch|Hỏi chốt: Cách đối chiếu này đã khớp với cách tính phụ cấp của anh chị chưa?",
+       _before:"Trước: tính phụ cấp tay theo tuyến trên bảng tính, nhầm một mức là khiếu nại kéo dài cả tháng, C&B phải đối chiếu lại từng người.",
+       _after:"Sau: phụ cấp gắn với ca và tuyến, đối chiếu ngay trên kết quả chấm công; kiểm tra được trước khi chốt lương."},
       {t:"C&B kiểm tra lương, phụ cấp & sai lệch trước khi chốt", mins:"Bài 3 · 10 phút",
-       pain:"C&B mất nhiều ngày tổng hợp lương, phụ cấp di chuyển và tăng ca; sai lệch thường phát hiện sau khi đã trả lương.",
-       sol:"Đưa công, phép và tăng ca đã duyệt vào công thức lương 23 thành phần, chạy kiểm tra trên phạm vi demo nhỏ, xem chi tiết phụ cấp và các khoản lệch trước khi phát hành phiếu lương.",
-       out:"Sai lệch được nhìn thấy và xử lý trước khi chốt; phiếu lương phát hành từ dữ liệu đã kiểm tra.",
-       val:"Kỳ lương minh bạch theo từng điểm kho; nhân viên tra phiếu lương thay vì hỏi lại C&B từng khoản.",
-       flow:["Công thức lương 23 thành phần","Chạy kiểm tra phạm vi nhỏ","Xem sai lệch & phụ cấp","Phiếu lương"]}
+       pain:"Lương chốt rồi mới phát hiện sai — sai một phụ cấp hay một ngày nghỉ chưa duyệt là phải sửa sau khi trả, vừa tốn công vừa mất niềm tin của nhân viên, nhất là với đội tài xế và kho đông người.",
+       sol:"Lấy công và ngày nghỉ đã duyệt đưa vào công thức lương 23 thành phần, chạy kiểm tra chi tiết lương và phụ cấp cho phạm vi demo nhỏ trước khi chốt. Chỉ rõ từng trường hợp sai lệch và cách sửa ngay trên màn hình, rồi mới phát hành phiếu lương khi dữ liệu đã sạch.",
+       out:"Sai lệch thấy trước khi chốt, không còn sửa sau khi trả; phiếu lương phát hành đúng dữ liệu đã duyệt, nhân viên tra cứu thấy khớp với công và nghỉ của mình.",
+       val:"Giảm rủi ro trả lương sai và số lần sửa sau chốt; C&B chốt lương tự tin hơn vì mọi con số đều đối chiếu được trước khi phát hành.",
+       flow:["Công thức lương 23 thành phần","Chạy kiểm tra phạm vi nhỏ","Xem sai lệch & phụ cấp","Phiếu lương"],
+       _story:"Mở đầu: Kỳ lương vừa rồi có trường hợp nào phải sửa sau khi trả không, và sửa mất bao lâu?|Mở bảng kiểm tra lương cho phạm vi demo nhỏ|Chỉ một trường hợp sai lệch và cách sửa trước khi chốt|Phát hành phiếu lương mẫu, chỉ phiếu lương khớp với công đã duyệt|Hỏi chốt: Anh chị cần thêm bước kiểm tra nào nữa trước khi chốt thật?",
+       _before:"Trước: chốt rồi mới phát hiện sai, sửa sau khi trả lương vừa tốn công vừa mất niềm tin, nhân viên tra phiếu thấy không khớp công.",
+       _after:"Sau: kiểm tra trước chốt trên dữ liệu đã duyệt, phát hành phiếu lương khi mọi sai lệch đã sửa xong."}
     ],
     fit:[["Công từ nhiều kho / điểm giao nhận tập trung về một nơi","ready"],["Giải trình thiếu log có duyệt, có dấu vết Applied","ready"],["Phụ cấp di chuyển theo chuyến / tuyến đặc thù","config"],["Đối chiếu tăng ca ca đêm trước kỳ lương","ready"],["Tích hợp máy chấm công tại từng kho","dev"]]
   },
@@ -550,25 +667,35 @@ var INDUSTRIES = {
     desc:"Nhiều cửa hàng, đông nhân viên bán thời gian, xoay ca liên tục và nghỉ đột xuất — biến động nhân sự cao là đặc thù không tránh được.",
     traits:["Nhiều cửa hàng, mỗi cửa hàng một nhịp ca riêng","Đông nhân viên bán thời gian, xoay ca, đổi ca thường xuyên","Nghỉ đột xuất nhiều, quản lý cửa hàng duyệt thay liên tục","Tuyển và tiếp nhận nhân viên mới liên tục cho cửa hàng"],
     discHint:"Hỏi sâu: đổi ca và nghỉ đột xuất đang xử lý qua kênh nào (nhóm chat? giấy?); lương bán thời gian theo ca đang tính tay ra sao.",
+    priorities:[{"id": 4, "title": "Chấm công theo cửa hàng & ca — xử lý đổi ca, thiếu log", "description": "Chấm công và xếp ca rõ theo từng cửa hàng; đổi ca và thiếu log được xử lý trong ngày có người duyệt, quản lý cửa hàng xoay ca kịp thời trước giờ bán hàng, không chờ cuối tuần."}, {"id": 5, "title": "Nghỉ phép trên ESS — số dư chạy đúng theo duyệt / từ chối / hủy", "description": "Nhân viên nộp nghỉ trên ESS, quản lý cửa hàng duyệt trên Approvals; số dư phép giảm đúng khi duyệt và tăng lại đúng khi từ chối hoặc hủy, tra cứu thấy khớp."}, {"id": 6, "title": "Lương bán thời gian theo ca & tiếp nhận nhanh cửa hàng mới", "description": "Lương bán thời gian tính theo ca thực tế và phụ cấp đúng cửa hàng, kiểm tra trước chốt; mở cửa hàng mới tiếp nhận nhanh vì ca, lương và phụ cấp đã có mẫu sẵn."}],
     scenarios:[
       {t:"Chấm công theo cửa hàng & ca — xử lý đổi ca, thiếu log", mins:"Bài 1 · 10 phút",
-       pain:"Mỗi cửa hàng chấm công và xếp ca một kiểu; đổi ca, thiếu log dồn về HR cuối tháng mới phát hiện, không còn đối chiếu được.",
-       sol:"Theo dõi chấm công theo cửa hàng và ca trên Dashboard, xử lý phiếu giải trình công trong Approvals — duyệt xong hệ thống bổ sung log và ghi trạng thái Applied.",
-       out:"Đổi ca và thiếu log được xử lý ngay trong kỳ, theo từng cửa hàng, có người duyệt chịu trách nhiệm.",
-       val:"HR nhìn được tình hình công theo cửa hàng mà không chờ báo cáo cuối tháng gửi về.",
-       flow:["Dashboard theo cửa hàng","Giải trình công","Duyệt → Applied","Công theo ca"]},
+       pain:"Mỗi cửa hàng chấm công và xếp ca một kiểu, ca bán hàng thiếu người không ai thấy sớm; đổi ca, thiếu log dồn về HR cuối tháng mới phát hiện, lúc đó đã không còn đối chiếu được với thực tế ca làm.",
+       sol:"Mở Dashboard xem phiếu chờ duyệt theo từng cửa hàng, xem kết quả chấm công theo ca để thấy ngay cửa hàng nào thiếu người, ca nào thiếu log. Xử lý thiếu log bằng phiếu giải trình có duyệt trên Approvals, rồi xem lại kết quả chấm công để chắc ca đã đủ người trước giờ bán hàng.",
+       out:"Ca và công rõ theo từng cửa hàng, thiếu log xử lý trong ngày; quản lý cửa hàng xoay ca kịp thời, không chờ đến cuối tuần mới biết thiếu người.",
+       val:"Cửa hàng không còn cảnh đến giờ bán mới biết thiếu người; HR không phải gom ca tay cuối tháng, đổi ca và thiếu log đều có người duyệt.",
+       flow:["Dashboard theo cửa hàng","Giải trình công","Duyệt → Applied","Công theo ca"],
+       _story:"Mở đầu: Ca bán hàng thiếu người thì cửa hàng biết bằng cách nào, và thường biết lúc nào?|Mở Dashboard theo cửa hàng, chỉ cửa hàng đang thiếu người|Mở phiếu giải trình thiếu log của ca bán hàng|Duyệt và chỉ log đã bổ sung, ca đã đủ người|Hỏi chốt: Quy trình xoay ca khi thiếu người của anh chị có bước nào bắt buộc khác không?",
+       _before:"Trước: mỗi cửa hàng chấm công một kiểu, ca thiếu người chỉ biết khi đã đến giờ bán; đổi ca, thiếu log dồn về HR cuối tháng.",
+       _after:"Sau: ca và công rõ theo từng cửa hàng, thiếu log xử lý trong ngày, quản lý xoay ca kịp trước giờ bán hàng."},
       {t:"Nghỉ phép trên ESS — số dư chạy đúng theo duyệt / từ chối / hủy", mins:"Bài 2 · 10 phút",
-       pain:"Nhân viên xin nghỉ qua nhiều kênh, quản lý duyệt xong mà số dư phép không khớp khiến cả nhân viên lẫn C&B mất niềm tin vào hệ thống.",
-       sol:"Nhân viên nộp phiếu nghỉ trên ESS, quản lý duyệt trên Approvals, kiểm tra trực tiếp số dư phép: giảm đúng khi duyệt, tăng lại đúng khi từ chối hoặc hủy.",
-       out:"Luồng nghỉ phép khép kín từ ESS tới số dư — đây là luồng đã kiểm chứng biến động số dư đúng cả 3 hướng duyệt, từ chối, hủy.",
-       val:"Nhân viên tự tra số dư phép, giảm hẳn câu hỏi “em còn mấy ngày phép” dồn về HR.",
-       flow:["ESS · Nộp phiếu nghỉ","Approvals · Duyệt","Số dư phép biến động","Tra cứu trên ESS"]},
+       pain:"Nhân viên nghỉ đột xuất và đổi ca tự do giữa các cửa hàng, quản lý duyệt miệng hoặc nhắn tin; số dư phép tính tay không khớp với quyết định duyệt, nhân viên tranh cãi vì thấy số dư của mình sai.",
+       sol:"Nhân viên nộp nghỉ trên ESS, quản lý cửa hàng duyệt trên Approvals; kiểm tra số dư phép giảm đúng khi duyệt và tăng lại đúng khi từ chối hoặc hủy, ngay trên màn hình. Mọi quyết định duyệt đều lưu dấu vết, không còn duyệt miệng.",
+       out:"Nghỉ và đổi ca có duyệt theo từng cửa hàng, số dư phép khớp với quyết định duyệt; nhân viên tra cứu thấy đúng số dư của mình.",
+       val:"Nhân viên tin vào số dư phép, quản lý không phải giải thích tay từng trường hợp; tranh cãi về phép giảm vì mọi thứ đều đối chiếu được.",
+       flow:["ESS · Nộp phiếu nghỉ","Approvals · Duyệt","Số dư phép biến động","Tra cứu trên ESS"],
+       _story:"Mở đầu: Số dư phép của nhân viên hiện khớp với quyết định duyệt hay vẫn tính tay riêng?|Nhân viên nộp nghỉ trên ESS|Quản lý cửa hàng duyệt trên Approvals|Chỉ số dư trước và sau duyệt: giảm khi duyệt, tăng lại khi từ chối|Hỏi chốt: Quy tắc duyệt nghỉ và đổi ca của anh chị có gì bắt buộc khác không?",
+       _before:"Trước: nghỉ đột xuất và đổi ca duyệt miệng, số dư tính tay không khớp, nhân viên tranh cãi vì thấy số dư sai.",
+       _after:"Sau: nghỉ và đổi ca có duyệt trên hệ thống, số dư chạy đúng theo duyệt, từ chối và hủy."},
       {t:"Lương bán thời gian theo ca & tiếp nhận nhanh cửa hàng mới", mins:"Bài 3 · 10 phút",
-       pain:"Lương bán thời gian tính theo ca và phụ cấp từng cửa hàng rất dễ sai; cửa hàng mới mở thì tuyển và tiếp nhận nhân viên chậm, thiếu hồ sơ.",
-       sol:"Tính lương theo công và ca đã duyệt, kiểm tra chi tiết trước khi chốt trong phạm vi demo nhỏ; đi tiếp luồng tuyển dụng: yêu cầu tuyển → ứng viên → phỏng vấn → tiếp nhận vào hồ sơ nhân viên.",
-       out:"Lương theo ca được kiểm tra trước chốt; nhân viên mới đi trọn luồng từ ứng viên thành hồ sơ chính thức.",
-       val:"Cửa hàng mới có người nhanh hơn mà vẫn đủ hồ sơ, hợp đồng và tài khoản ESS ngay từ ngày đầu.",
-       flow:["Lương theo ca","Kiểm tra trước chốt","Tuyển dụng → Ứng viên","Tiếp nhận → Hồ sơ NV"]}
+       pain:"Nhân viên bán thời gian làm theo ca ở nhiều cửa hàng, lương tính theo giờ làm và phụ cấp từng cửa hàng; sai một ca là nhân viên phản ứng ngay, nhóm vào ra liên tục nên chỉ cần sai vài lần là mất người.",
+       sol:"Lấy công theo ca và phụ cấp cửa hàng đưa vào công thức lương, kiểm tra chi tiết cho phạm vi demo nhỏ trước khi chốt: giờ làm theo ca, phụ cấp đúng cửa hàng, số giờ khớp với ca đã duyệt. Sai lệch thấy trước khi phát hành phiếu lương.",
+       out:"Lương theo ca thực tế, phụ cấp đúng cửa hàng, kiểm tra trước chốt; nhân viên bán thời gian tra phiếu thấy khớp với ca mình đã làm.",
+       val:"Giảm khiếu nại lương của nhân viên bán thời gian; cửa hàng giữ được người vì lương trả đúng ca, đúng giờ, đúng cửa hàng.",
+       flow:["Lương theo ca","Kiểm tra trước chốt","Tuyển dụng → Ứng viên","Tiếp nhận → Hồ sơ NV"],
+       _story:"Mở đầu: Lương bán thời gian hiện tính theo ca hay tính chung, và sai một ca thì xử lý thế nào?|Mở kết quả chấm công theo ca của một nhân viên bán thời gian|Chỉ phụ cấp theo cửa hàng và giờ làm theo ca|Chạy kiểm tra lương cho phạm vi demo, chỉ một trường hợp sai lệch|Hỏi chốt: Cách tính lương theo ca của anh chị có điểm nào bắt buộc khác không?",
+       _before:"Trước: lương bán thời gian tính tay theo ca, sai một ca là nhân viên phản ứng ngay, nhóm vào ra liên tục nên dễ mất người.",
+       _after:"Sau: lương theo ca thực tế và phụ cấp đúng cửa hàng, kiểm tra trước chốt, nhân viên tra phiếu thấy khớp ca đã làm."}
     ],
     fit:[["Chấm công và xếp ca theo từng cửa hàng","ready"],["Số dư phép biến động đúng khi duyệt / từ chối / hủy","ready"],["Đổi ca giữa nhân viên hai cửa hàng khác nhau","config"],["Lương bán thời gian theo ca và phụ cấp cửa hàng","config"],["Chấm công bằng thiết bị riêng của chuỗi","dev"]]
   },
@@ -577,25 +704,35 @@ var INDUSTRIES = {
     desc:"Vận hành 24/7 không có “giờ hành chính”, lễ tết và mùa cao điểm là lúc công – lương dễ sai nhất, nhiều nhân viên thời vụ.",
     traits:["Vận hành 24/7: lễ tân, buồng phòng, F&B, kỹ thuật nhiều ca gối nhau","Tăng ca lễ tết và mùa cao điểm biến động mạnh","Nhiều nhân viên thời vụ theo mùa, hợp đồng ngắn hạn","Phê duyệt nghỉ phải theo bộ phận để không hụt ca trực"],
     discHint:"Hỏi sâu: ca trực lễ tết đang lên lịch và tính phụ cấp thế nào; nhân viên thời vụ ký và tái ký hợp đồng ra sao mỗi mùa cao điểm.",
+    priorities:[{"id": 7, "title": "Ca 24/7 & thiếu log được phát hiện, giải trình rõ ràng", "description": "Ca xoay 24/7 rõ theo từng bộ phận, thiếu log ca đêm được phát hiện trong ngày; giải trình có người duyệt và dấu vết, ca đêm đủ người trước giờ cao điểm."}, {"id": 8, "title": "Nghỉ phép mùa cao điểm — duyệt theo bộ phận, số dư chính xác", "description": "Nghỉ phép mùa cao điểm duyệt theo bộ phận trên Approvals; số dư phép giảm đúng khi duyệt và tăng lại đúng khi từ chối hoặc hủy, đủ người phục vụ mà vẫn đảm bảo quyền nghỉ."}, {"id": 9, "title": "Lương, tăng ca lễ & hợp đồng thời vụ", "description": "Lương tăng ca lễ và phụ cấp ca đêm kiểm tra trước chốt trên công thức 23 thành phần; hợp đồng thời vụ và tái ký rõ ràng, có nhắc hạn, không sót."}],
     scenarios:[
       {t:"Ca 24/7 & thiếu log được phát hiện, giải trình rõ ràng", mins:"Bài 1 · 10 phút",
-       pain:"Ca gối nhau 24/7 khiến thiếu log và công bất thường khó phát hiện; HR chỉ biết khi nhân viên thắc mắc về lương.",
-       sol:"Xem phiếu chờ duyệt và quá hạn SLA trên Dashboard, xử lý phiếu giải trình công trong Approvals — duyệt xong ghi Applied và bổ sung lượt chấm công có dấu vết.",
-       out:"Mọi ca thiếu log đều có giải trình và người duyệt, kể cả ca đêm và ca lễ tết.",
-       val:"Giảm thắc mắc lương do công thiếu; trưởng bộ phận chịu trách nhiệm duyệt công của ca mình.",
-       flow:["Dashboard","Approvals · Giải trình công","Duyệt → Applied","Kết quả chấm công"]},
+       pain:"Khách sạn chạy ca xoay 24/7, nhân viên buồng phòng và lễ tân thiếu log ca đêm mà không ai biết sớm; đến khi xếp người dọn phòng mới phát hiện thiếu, khách check-in trễ.",
+       sol:"Mở Dashboard xem phiếu chờ duyệt theo từng bộ phận, xử lý thiếu log bằng phiếu giải trình có duyệt trên Approvals, rồi xem lại kết quả chấm công để chắc ca đêm đã đủ người trước giờ cao điểm.",
+       out:"Thiếu log xử lý trong ngày, ca theo bộ phận rõ ràng; bộ phận biết trước ca đêm thiếu người để xếp người kịp.",
+       val:"Không để thiếu người dọn phòng làm khách check-in trễ; lễ tân và buồng phòng phối hợp được vì ca và công đều rõ theo bộ phận.",
+       flow:["Dashboard","Approvals · Giải trình công","Duyệt → Applied","Kết quả chấm công"],
+       _story:"Mở đầu: Ca đêm thiếu người thì bộ phận biết bằng cách nào, và thường biết lúc nào?|Mở Dashboard theo bộ phận, chỉ bộ phận đang thiếu log ca đêm|Mở phiếu giải trình thiếu log ca đêm|Duyệt và chỉ log đã bổ sung, ca đã đủ người|Hỏi chốt: Quy trình giải trình ca đêm của anh chị có bước nào bắt buộc khác không?",
+       _before:"Trước: ca 24/7 theo bộ phận rời rạc, thiếu log ca đêm biết muộn, xếp người dọn phòng bị động, khách check-in trễ.",
+       _after:"Sau: ca tập trung theo bộ phận, thiếu log xử lý trong ngày có duyệt, ca đêm đủ người trước giờ cao điểm."},
       {t:"Nghỉ phép mùa cao điểm — duyệt theo bộ phận, số dư chính xác", mins:"Bài 2 · 10 phút",
-       pain:"Mùa cao điểm ai cũng cần trực, nghỉ phép duyệt chồng chéo giữa các bộ phận và số dư phép không khớp gây tranh cãi sau mùa vụ.",
-       sol:"Nhân viên nộp nghỉ trên ESS, trưởng bộ phận duyệt trên Approvals theo bộ phận của mình, kiểm tra số dư phép giảm đúng khi duyệt và tăng lại đúng khi từ chối hoặc hủy.",
-       out:"Lịch nghỉ theo bộ phận rõ ràng trong mùa cao điểm; số dư phép của từng nhân viên khớp với phiếu đã duyệt.",
-       val:"Không hụt ca trực vì nghỉ chồng chéo; nhân viên thời vụ và chính thức đều tra được phép trên ESS.",
-       flow:["ESS · Nộp phiếu nghỉ","Duyệt theo bộ phận","Số dư phép biến động","Lịch trực bộ phận"]},
+       pain:"Mùa cao điểm ai cũng xin nghỉ cùng lúc, duyệt không theo bộ phận sẽ thiếu người phục vụ đúng lúc khách đông nhất; duyệt tay theo cảm tính còn gây mất công bằng giữa các bộ phận.",
+       sol:"Nhân viên nộp nghỉ trên ESS, trưởng bộ phận duyệt trên Approvals theo đúng bộ phận của mình; kiểm tra số dư phép giảm đúng khi duyệt và tăng lại đúng khi từ chối hoặc hủy, để mùa cao điểm vẫn đủ người mà quyền nghỉ vẫn đảm bảo.",
+       out:"Nghỉ mùa cao điểm có duyệt theo bộ phận, số dư khớp; bộ phận nào cũng đủ người phục vụ, không còn cảnh duyệt xong mới biết thiếu.",
+       val:"Giữ đủ người phục vụ mùa cao điểm mà vẫn đảm bảo quyền nghỉ của nhân viên; duyệt nghỉ công bằng theo bộ phận, có dấu vết.",
+       flow:["ESS · Nộp phiếu nghỉ","Duyệt theo bộ phận","Số dư phép biến động","Lịch trực bộ phận"],
+       _story:"Mở đầu: Mùa cao điểm anh chị duyệt nghỉ theo nguyên tắc nào để không thiếu người phục vụ?|Nhân viên nộp nghỉ trên ESS|Trưởng bộ phận duyệt trên Approvals|Chỉ số dư trước và sau duyệt: giảm khi duyệt, tăng lại khi từ chối|Hỏi chốt: Nguyên tắc duyệt nghỉ mùa cao điểm của anh chị có gì bắt buộc khác không?",
+       _before:"Trước: nghỉ mùa cao điểm duyệt tay, không theo bộ phận nên dễ thiếu người phục vụ lúc khách đông, duyệt theo cảm tính.",
+       _after:"Sau: nghỉ có duyệt theo bộ phận, số dư đúng, mùa cao điểm vẫn đủ người phục vụ."},
       {t:"Lương, tăng ca lễ & hợp đồng thời vụ", mins:"Bài 3 · 10 phút",
-       pain:"Tăng ca lễ tết và phụ cấp ca đêm là nhóm khoản dễ sai nhất trong kỳ lương; hợp đồng thời vụ hết hạn giữa mùa vụ dễ bị bỏ sót tái ký.",
-       sol:"Đưa công, tăng ca lễ đã duyệt vào công thức lương 23 thành phần, kiểm tra sai lệch trên phạm vi demo nhỏ trước khi chốt; kết hợp theo dõi hợp đồng thời vụ sắp hết hạn để tái ký kịp thời.",
-       out:"Kỳ lương mùa cao điểm được kiểm tra trước khi trả; danh sách hợp đồng thời vụ cần tái ký hiện rõ thay vì tra tay.",
-       val:"Trả đúng tăng ca lễ ngay trong kỳ cao điểm — yếu tố giữ chân nhân viên mùa vụ quay lại mùa sau.",
-       flow:["Công thức lương 23 thành phần","Kiểm tra tăng ca lễ","Hợp đồng sắp hết hạn","Phiếu lương"]}
+       pain:"Tăng ca lễ và phụ cấp ca đêm tính tay theo từng bộ phận rất dễ sai, nhất là kỳ lễ dài; hợp đồng thời vụ theo dõi tay trên bảng tính, đến hạn tái ký mới biết sót, nhân viên thời vụ làm việc không có hợp đồng.",
+       sol:"Lấy công ca đêm và tăng ca lễ vào công thức lương 23 thành phần, kiểm tra trước chốt cho phạm vi demo; xem hợp đồng thời vụ và quy trình tái ký ngay trên hệ thống để không sót hạn.",
+       out:"Lương lễ và ca đêm kiểm tra trước chốt, hợp đồng thời vụ không sót tái ký; mọi khoản lễ, ca đêm và hợp đồng đều đối chiếu được trước kỳ lương.",
+       val:"Giảm khiếu nại lương lễ và ca đêm; giảm rủi ro hợp đồng quá hạn vì tái ký được nhắc trước, không còn theo dõi tay.",
+       flow:["Công thức lương 23 thành phần","Kiểm tra tăng ca lễ","Hợp đồng sắp hết hạn","Phiếu lương"],
+       _story:"Mở đầu: Kỳ lễ vừa rồi có trường hợp tăng ca nào phải sửa sau trả không?|Mở bảng kiểm tra lương tăng ca lễ, chỉ phụ cấp ca đêm|Chỉ một trường hợp sai lệch và cách sửa trước chốt|Mở hợp đồng thời vụ sắp hết hạn và quy trình tái ký|Hỏi chốt: Anh chị cần thêm bước kiểm tra nào trước khi chốt lương lễ?",
+       _before:"Trước: tăng ca lễ và phụ cấp ca đêm tính tay dễ sai, hợp đồng thời vụ theo dõi tay, đến hạn mới biết sót tái ký.",
+       _after:"Sau: lương lễ và ca đêm kiểm tra trước chốt, hợp đồng thời vụ có nhắc tái ký, không sót hạn."}
     ],
     fit:[["Giải trình công ca đêm / ca gối 24/7","ready"],["Nghỉ phép duyệt theo bộ phận, số dư chính xác","ready"],["Phụ cấp tăng ca lễ tết theo chính sách riêng","config"],["Theo dõi hợp đồng thời vụ và tái ký","ready"],["Lên lịch ca trực tự động theo công suất phòng","no"]]
   },
@@ -604,25 +741,35 @@ var INDUSTRIES = {
     desc:"Nhà máy nhiều ca, tăng ca sản xuất theo đơn hàng, nhiều loại hợp đồng — chỉ cần lệch công một ca là lệch cả dây chuyền lương.",
     traits:["Nhiều ca sản xuất, tăng ca biến động theo đơn hàng","Một hoặc nhiều nhà máy, nhiều loại hợp đồng lao động","Công nhân số lượng lớn, biến động theo mùa đơn hàng","C&B cần công – lương chính xác theo từng nhà máy, từng ca"],
     discHint:"Hỏi sâu: tăng ca sản xuất đang được ai xác nhận trước khi vào lương; có bao nhiêu nhóm chính sách lương và phụ cấp theo ca / độc hại.",
+    priorities:[{"id": 10, "title": "Công nhà máy tập trung — phát hiện công bất thường & giải trình", "description": "Công 2 nhà máy tập trung về một nơi, công bất thường theo chuyền được phát hiện trong ngày; giải trình có người duyệt và dấu vết, không để sai công kéo tới kỳ lương."}, {"id": 11, "title": "Hợp đồng, tái ký & nghỉ phép theo ca sản xuất", "description": "Hợp đồng rõ loại và hạn, tái ký được nhắc trước không sót; nghỉ theo ca có duyệt trên Approvals, số dư phép khớp với quyết định duyệt."}, {"id": 12, "title": "Lương theo công, tăng ca & phụ cấp — công thức 23 thành phần", "description": "Lương theo công thực tế, tăng ca theo đơn hàng và phụ cấp đúng ca, tính trên công thức 23 thành phần và kiểm tra trước chốt; phiếu lương khớp với ca và chuyền đã làm."}],
     scenarios:[
       {t:"Công nhà máy tập trung — phát hiện công bất thường & giải trình", mins:"Bài 1 · 10 phút",
-       pain:"Công từ các ca và nhà máy tổng hợp thủ công; công bất thường, thiếu log phát hiện muộn khiến tổ trưởng và HR phải rà lại từng ca.",
-       sol:"Theo dõi phiếu chờ duyệt và quá hạn trên Dashboard, xử lý phiếu giải trình công trong Approvals — duyệt xong hệ thống bổ sung log và ghi trạng thái Applied.",
-       out:"Công bất thường của từng ca được giải trình và duyệt ngay trong kỳ, có căn cứ khi tính lương sản xuất.",
-       val:"Tổ trưởng xác nhận công của ca mình trên hệ thống thay vì ký giấy chuyển về HR.",
-       flow:["Dashboard","Approvals · Giải trình công","Duyệt → Applied","Công theo ca / nhà máy"]},
+       pain:"Công từ 2 nhà máy về chậm, công bất thường theo chuyền sản xuất — làm sai chuyền, tăng ca đột xuất — phát hiện muộn; đến kỳ lương mới biết sai công, công nhân cả chuyền phản ứng.",
+       sol:"Mở Dashboard xem phiếu chờ duyệt theo từng nhà máy, xử lý công bất thường bằng phiếu giải trình có duyệt trên Approvals, rồi xem lại kết quả chấm công để chắc công bất thường đã xử lý xong trong ngày.",
+       out:"Công bất thường xử lý trong ngày, có duyệt và dấu vết; công theo nhà máy và theo chuyền đều rõ trước kỳ lương.",
+       val:"Không để sai công kéo tới kỳ lương mới phát hiện; công nhân tin vào bảng công vì mọi ca bất thường đều có người duyệt.",
+       flow:["Dashboard","Approvals · Giải trình công","Duyệt → Applied","Công theo ca / nhà máy"],
+       _story:"Mở đầu: Công bất thường theo chuyền hiện phát hiện bằng cách nào, và thường phát hiện lúc nào?|Mở Dashboard theo nhà máy, chỉ chuyền đang có công bất thường|Mở phiếu giải trình công bất thường|Duyệt và chỉ log đã bổ sung|Hỏi chốt: Quy trình xử lý công bất thường của anh chị có bước nào bắt buộc khác không?",
+       _before:"Trước: công theo nhà máy rời rạc, công bất thường theo chuyền biết muộn, đến kỳ lương mới phát hiện sai.",
+       _after:"Sau: công tập trung theo nhà máy, công bất thường xử lý trong ngày có duyệt và dấu vết."},
       {t:"Hợp đồng, tái ký & nghỉ phép theo ca sản xuất", mins:"Bài 2 · 10 phút",
-       pain:"Nhiều loại hợp đồng và đợt tái ký lớn dễ bỏ sót; nghỉ phép không theo ca sản xuất gây hụt người trên dây chuyền.",
-       sol:"Theo dõi hợp đồng và thời hạn tái ký trong hồ sơ nhân viên; nhân viên nộp nghỉ trên ESS, quản lý duyệt theo ca, số dư phép biến động đúng khi duyệt, từ chối hoặc hủy.",
-       out:"Đợt tái ký được nhìn thấy trước khi hết hạn; lịch nghỉ khớp với ca sản xuất, số dư phép chính xác.",
-       val:"Tránh rủi ro lao động do hợp đồng hết hạn không tái ký; dây chuyền không hụt người vì nghỉ chồng ca.",
-       flow:["Hồ sơ & hợp đồng","Cảnh báo tái ký","ESS · Nghỉ phép","Số dư phép biến động"]},
+       pain:"Hợp đồng nhiều loại theo chuyền và ca sản xuất, sắp hết hạn theo dõi tay trên bảng tính nên dễ sót tái ký; nghỉ theo ca duyệt không đều giữa các chuyền, số dư phép của công nhân không khớp.",
+       sol:"Xem hợp đồng và trường hợp sắp hết hạn ngay trên hệ thống, nhân viên nộp nghỉ trên ESS, quản lý chuyền duyệt trên Approvals và kiểm tra số dư giảm đúng khi duyệt, tăng lại đúng khi từ chối hoặc hủy.",
+       out:"Hợp đồng không sót tái ký, nghỉ theo ca có duyệt và số dư khớp; mọi loại hợp đồng và nghỉ phép đều rõ theo từng chuyền.",
+       val:"Giảm rủi ro hợp đồng quá hạn và tranh cãi số dư phép; quản lý chuyền duyệt nghỉ đều tay vì mọi quyết định đều có dấu vết.",
+       flow:["Hồ sơ & hợp đồng","Cảnh báo tái ký","ESS · Nghỉ phép","Số dư phép biến động"],
+       _story:"Mở đầu: Hợp đồng sắp hết hạn hiện theo dõi bằng gì, và có bao giờ sót tái ký chưa?|Mở danh sách hợp đồng sắp hết hạn theo chuyền|Nhân viên nộp nghỉ trên ESS và quản lý duyệt|Chỉ số dư trước và sau duyệt|Hỏi chốt: Quy trình tái ký và duyệt nghỉ theo ca của anh chị có gì bắt buộc khác không?",
+       _before:"Trước: hợp đồng theo dõi tay dễ sót tái ký, nghỉ theo ca duyệt không đều giữa các chuyền, số dư phép không khớp.",
+       _after:"Sau: hợp đồng có nhắc tái ký, nghỉ theo ca có duyệt và số dư đúng, rõ theo từng chuyền."},
       {t:"Lương theo công, tăng ca & phụ cấp — công thức 23 thành phần", mins:"Bài 3 · 10 phút",
-       pain:"C&B mất nhiều ngày tổng hợp lương theo công, tăng ca và phụ cấp nhiều nhà máy; sai lệch thường chỉ rõ khi công nhân nhận lương.",
-       sol:"Đưa kết quả chấm công, tăng ca và ngày nghỉ đã duyệt vào công thức lương 23 thành phần, chạy kiểm tra trên phạm vi demo nhỏ, xem chi tiết phụ cấp và sai lệch trước khi phát hành phiếu lương.",
-       out:"Sai lệch được xử lý trước khi chốt lương; mỗi công nhân có phiếu lương chi tiết để tự đối chiếu.",
-       val:"Kỳ lương nhà máy minh bạch theo ca và phụ cấp — giảm thắc mắc tập thể sau ngày trả lương.",
-       flow:["Công + Tăng ca đã duyệt","Công thức lương 23 thành phần","Kiểm tra sai lệch","Phiếu lương"]}
+       pain:"Tăng ca theo đơn hàng và phụ cấp theo ca tính tay trên bảng tính; sai một ca là cả chuyền phản ứng vì lương công nhân gắn chặt với ca và chuyền, sửa sau khi trả vừa tốn công vừa mất niềm tin.",
+       sol:"Lấy công, tăng ca và phụ cấp vào công thức lương 23 thành phần, kiểm tra chi tiết cho phạm vi demo nhỏ trước khi chốt: giờ tăng ca theo đơn hàng, phụ cấp đúng ca, rồi mới phát hành phiếu lương khi dữ liệu đã sạch.",
+       out:"Lương theo công thực tế, tăng ca và phụ cấp đúng, kiểm tra trước chốt; công nhân tra phiếu thấy khớp với ca và chuyền mình đã làm.",
+       val:"Giảm khiếu nại lương công nhân và số lần sửa sau chốt; lương trả đúng ca, đúng chuyền nên chuyền yên tâm làm việc.",
+       flow:["Công + Tăng ca đã duyệt","Công thức lương 23 thành phần","Kiểm tra sai lệch","Phiếu lương"],
+       _story:"Mở đầu: Tăng ca theo đơn hàng hiện tính và đối chiếu như thế nào, và sai một ca thì xử lý ra sao?|Mở kết quả chấm công tăng ca theo chuyền|Mở bảng kiểm tra lương cho phạm vi demo, chỉ một trường hợp sai lệch|Phát hành phiếu lương mẫu, chỉ phiếu khớp với công đã duyệt|Hỏi chốt: Anh chị cần thêm bước kiểm tra nào trước khi chốt lương thật?",
+       _before:"Trước: tăng ca và phụ cấp tính tay, sai một ca là cả chuyền phản ứng, sửa sau khi trả vừa tốn công vừa mất niềm tin.",
+       _after:"Sau: lương theo công thực tế, tăng ca và phụ cấp đúng, kiểm tra trước chốt, phiếu lương khớp ca đã làm."}
     ],
     fit:[["Công tập trung theo ca và theo nhà máy","ready"],["Hợp đồng nhiều loại và cảnh báo tái ký","ready"],["Nghỉ phép theo ca sản xuất, số dư chính xác","ready"],["Phụ cấp độc hại / phụ cấp ca theo chính sách nhà máy","config"],["Chấm công tích hợp cổng kiểm soát ra vào nhà máy","dev"]]
   }
@@ -664,7 +811,7 @@ logistics: {
     {f:"Đi thẳng vào phụ cấp tuyến và OT ca đêm: hai khoản chiếm phần lớn thời gian rà soát và phần lớn thắc mắc của tài xế.", s:"Công → OT đã duyệt → Phụ cấp tuyến → Phiếu lương chi tiết"},
     {f:"Logistic tuyển theo đợt mở kho và mùa cao điểm: hồ sơ tài xế cần đủ bằng lái, giấy khám sức khỏe và hạn giấy tờ — nhắc khách hỏi về cảnh báo hết hạn giấy tờ.", s:"Yêu cầu tuyển → Ứng viên → Tiếp nhận → Hồ sơ + hạn giấy tờ"},
     {f:"Ba câu hỏi IT sẽ hỏi: máy chấm công ở 15 điểm đồng bộ thế nào, tài xế ở vùng sóng yếu chấm công ra sao, phân quyền trưởng kho theo điểm bằng cơ chế nào (333 quyền RBAC, gán theo đơn vị).", s:"RBAC theo đơn vị · SSO · Kiến trúc Windows/IIS"},
-    {f:"Nói khung chi phí theo số điểm triển khai và số tài khoản ESS cho tài xế — hai biến số chi phí lớn nhất của ngành này; giá cụ thể để đề xuất thương mại trả lời.", s:"Phạm vi theo điểm · License theo vai trò sử dụng"}
+    {f:"Nói khung chi phí theo số điểm triển khai và số tài khoản ESS cho tài xế — hai biến số chi phí lớn nhất của ngành này; giá cụ thể để đề xuất thương mại trả lời.", s:"Phạm vi theo điểm · Giấy phép theo vai trò sử dụng"}
   ],
   talk:[
     {open:"“Trước khi mở hệ thống, em xác nhận lại 3 việc anh/chị đã chốt ở buổi khảo sát: công từ các kho về trung tâm, OT ca đêm, và phụ cấp tuyến. Hôm nay em chỉ demo đúng 3 việc này.”", ask:["Thứ tự ưu tiên này còn đúng không, có việc nào mới phát sinh sau buổi khảo sát?"], avoid:"Không mở đầu bằng giới thiệu danh sách phân hệ của OneNow.", trans:"“Để thấy vì sao 3 việc này đau, em đi vào quy trình công hiện tại của một kho mẫu.”"},
@@ -726,7 +873,7 @@ fnb: {
     {f:"Đi thẳng vào lương theo giờ của lực lượng bán thời gian: nguồn sai lệch và thắc mắc lớn nhất của chuỗi.", s:"Công theo ca → Lương theo giờ → Kiểm tra → Phiếu lương"},
     {f:"Đây là vai trò quyết định cảm xúc của buổi demo F&B: cho xem trọn vòng yêu cầu tuyển → ứng viên → tiếp nhận → ca đầu tiên.", s:"Tuyển dụng → Tiếp nhận → Hồ sơ + tài khoản ESS"},
     {f:"IT sẽ hỏi về triển khai theo cửa hàng: tài khoản cho nhân viên vào ra liên tục, chấm công bằng thiết bị gì tại quầy, phân quyền quản lý cửa hàng.", s:"RBAC theo cửa hàng · ESS trên điện thoại cá nhân"},
-    {f:"Nói khung chi phí theo số cửa hàng và tỉ lệ tài khoản bán thời gian — nhóm này vào ra liên tục nên cách tính license phải hỏi rõ trong đề xuất thương mại.", s:"Phạm vi theo cửa hàng · License theo headcount فعال"}
+    {f:"Nói khung chi phí theo số cửa hàng và tỉ lệ tài khoản bán thời gian — nhóm này vào ra liên tục nên cách tính giấy phép phải hỏi rõ trong đề xuất thương mại.", s:"Phạm vi theo cửa hàng · Giấy phép theo số nhân viên"}
   ],
   talk:[
     {open:"“Em xác nhận lại 3 việc đã chốt khi khảo sát: đổi ca không dấu vết, lương bán thời gian theo giờ, và tuyển người cho cửa hàng mới. Hôm nay em demo đúng 3 việc này, theo đúng nhịp của một cửa hàng.”", ask:["Có cửa hàng nào đang là điểm nóng nhất về thiếu ca không — em lấy bối cảnh cửa hàng đó để demo?"], avoid:"Không demo theo góc nhìn của văn phòng HR — luôn đứng ở cửa hàng.", trans:"“Em bắt đầu từ một tối thứ Sáu ở cửa hàng mẫu.”"},
@@ -743,7 +890,7 @@ fnb: {
     {owner:"VD: HR chuỗi (khách) + Presales", purpose:"Chốt 3 cửa hàng PoC và quy tắc đổi ca / nghỉ đột xuất áp dụng thống nhất."},
     {owner:"VD: 3 quản lý cửa hàng + quản lý vùng", purpose:"Workshop xếp ca: mẫu ca gãy, ca tối cuối tuần, quy trình duyệt đổi ca."},
     {owner:"VD: C&B + quản lý cửa hàng mẫu", purpose:"PoC 1 kỳ lương tại 3 cửa hàng, đối chiếu lương theo giờ với cách tính hiện tại."},
-    {owner:"VD: Sales phụ trách", purpose:"Báo giá theo số cửa hàng và headcount, làm rõ cách tính cho nhân viên bán thời gian."},
+    {owner:"VD: Sales phụ trách", purpose:"Báo giá theo số cửa hàng và số nhân viên, làm rõ cách tính cho nhân viên bán thời gian."},
     {owner:"VD: Giám đốc Vận hành + chủ chuỗi", purpose:"Trình kết quả PoC 3 cửa hàng và kế hoạch nhân rộng theo đợt khai trương."}
   ],
   demoData:{name:"Công ty demo FNB-DEMO", bullets:["3 cửa hàng mẫu: Cửa hàng Quận 1 (đông giờ tối), Cửa hàng Văn phòng (đông giờ trưa), Cửa hàng TTTM (đông cuối tuần)","90 nhân sự mẫu: 30 toàn thời gian, 60 bán thời gian với ca gãy 4–6 giờ","Nạp sẵn: 3 đổi ca, 2 nghỉ đột xuất, 1 nhân viên làm ở 2 cửa hàng để demo gộp công","Hồ sơ ứng viên mẫu sẵn sàng tiếp nhận + 1 kỳ lương nhỏ theo giờ của 1 cửa hàng"]},
@@ -790,7 +937,7 @@ IND_DEEP.hotel = {
     {f:"Đi thẳng vào service charge và tăng ca lễ: hai khoản quyết định niềm tin của nhân viên mùa vụ với khách sạn.", s:"Công + Tăng ca lễ → Kiểm tra → Phiếu lương chi tiết căn cứ"},
     {f:"Tuyển thời vụ theo đợt mùa vụ: vào nhanh theo lô, hồ sơ và hợp đồng ngắn hạn đầy đủ, hết mùa xử lý theo đợt.", s:"Yêu cầu tuyển theo đợt → Ứng viên → Tiếp nhận → Hợp đồng thời vụ"},
     {f:"IT sẽ hỏi về PMS: nói thẳng tích hợp PMS là điểm cần đánh giá thêm; phần chắc chắn là RBAC theo bộ phận và ESS cho nhân viên.", s:"RBAC theo bộ phận · SSO · Kiến trúc Windows/IIS"},
-    {f:"Nói khung chi phí theo headcount đỉnh mùa vụ và nhóm thời vụ ngắn hạn — cách tính cho nhân viên 3 tháng phải làm rõ trong đề xuất thương mại.", s:"Phạm vi theo mùa vụ · License cho thời vụ (hỏi rõ)"}
+    {f:"Nói khung chi phí theo số nhân viên đỉnh mùa vụ và nhóm thời vụ ngắn hạn — cách tính cho nhân viên 3 tháng phải làm rõ trong đề xuất thương mại.", s:"Phạm vi theo mùa vụ · Giấy phép cho thời vụ (hỏi rõ)"}
   ],
   talk:[
     {open:"“Em xác nhận 3 việc đã chốt: công ca 24/7, nghỉ phép theo bộ phận trong mùa cao điểm, và lương kèm service charge. Em demo đúng 3 việc này theo nhịp của một ngày vận hành khách sạn.”", ask:["Mùa cao điểm gần nhất của khách sạn là tháng nào — em lấy bối cảnh đó làm nền cho cả buổi?"], avoid:"Không mở đầu bằng tính năng đặt phòng hay PMS — buổi này chỉ nói về nhân sự.", trans:"“Em bắt đầu từ ca đêm Lễ tân — ca ít người nhất và rủi ro nhất.”"},
@@ -853,7 +1000,7 @@ IND_DEEP.manufacturing = {
     {f:"Đi thẳng vào phụ cấp ca, độc hại và chuyên cần: ba khoản quyết định đúng / sai của kỳ lương công nhân.", s:"Công + OT → Công thức 23 thành phần → Kiểm tra → Phiếu lương"},
     {f:"Tuyển công nhân theo đợt đơn hàng: vào theo lô hàng trăm người, hồ sơ tối thiểu đủ pháp lý, phân ca ngay khi tiếp nhận.", s:"Tuyển theo đợt → Tiếp nhận → Hồ sơ + phân ca"},
     {f:"IT sẽ hỏi về cổng ra vào và số lượng người dùng đồng thời giờ đổi ca: nói rõ phần tích hợp cổng cần đánh giá theo thiết bị thực tế; RBAC và kiến trúc là phần trả lời chắc chắn được.", s:"RBAC theo nhà máy · SSO · SQL Server / IIS"},
-    {f:"Nói khung chi phí theo tổng headcount đỉnh và số nhà máy; lưu ý chi phí đào tạo tổ trưởng là hạng mục triển khai thật, không giấu.", s:"Phạm vi theo nhà máy · License theo headcount"}
+    {f:"Nói khung chi phí theo tổng số nhân viên đỉnh và số nhà máy; lưu ý chi phí đào tạo tổ trưởng là hạng mục triển khai thật, không giấu.", s:"Phạm vi theo nhà máy · Giấy phép theo số nhân viên"}
   ],
   talk:[
     {open:"“Em xác nhận 3 việc đã chốt: công theo ca tập trung, hợp đồng và tái ký theo đợt, và lương kèm phụ cấp ca. Em demo theo đúng một ca sản xuất mẫu của nhà máy.”", ask:["Ca nào của nhà máy đang đau nhất — ca đêm hay ca 12 giờ? Em lấy ca đó làm bối cảnh chính."], avoid:"Không mở đầu bằng cơ cấu tổ chức — mở bằng ca sản xuất.", trans:"“Em bắt đầu từ 6 giờ sáng, lúc ca đêm kết thúc.”"},
@@ -870,7 +1017,7 @@ IND_DEEP.manufacturing = {
     {owner:"VD: HR nhà máy (khách) + Presales", purpose:"Chốt tổ sản xuất PoC, phạm vi ca áp dụng và đợt tái ký dùng làm deadline."},
     {owner:"VD: 2 tổ trưởng + quản đốc + C&B nhà máy", purpose:"Workshop tại nhà máy: quy trình xác nhận công / OT của tổ trưởng, chính sách chuyên cần và phụ cấp độc hại."},
     {owner:"VD: C&B nhà máy + BA", purpose:"PoC 1 tổ trọn 1 kỳ lương, đối chiếu phụ cấp với bảng lương hiện tại của tổ đó."},
-    {owner:"VD: Sales phụ trách", purpose:"Báo giá theo tổng headcount và số nhà máy, gồm hạng mục đào tạo tổ trưởng."},
+    {owner:"VD: Sales phụ trách", purpose:"Báo giá theo tổng số nhân viên và số nhà máy, gồm hạng mục đào tạo tổ trưởng."},
     {owner:"VD: Giám đốc nhà máy + HR tập đoàn", purpose:"Trình kết quả PoC theo tổ và lộ trình nhân rộng theo nhà máy / đợt tuyển."}
   ],
   demoData:{name:"Công ty demo SX-DEMO", bullets:["2 nhà máy mẫu: Nhà máy 1 (ca 8 giờ + ca đêm), Nhà máy 2 (ca 12 giờ) với tổ sản xuất theo ca","300 nhân sự mẫu: công nhân theo tổ, tổ trưởng, quản đốc, HR / C&B nhà máy","Nạp sẵn: ca đêm thiếu log ở cổng, OT tăng đột biến theo đơn hàng, đợt 40 hợp đồng sắp hết hạn","1 kỳ lương nhỏ của 1 tổ gồm phụ cấp ca đêm, độc hại, chuyên cần — sẵn sàng kiểm tra ở Bài 3"]},
@@ -883,46 +1030,46 @@ IND_DEEP.manufacturing = {
 
 var STORY = {
 logistics:[
- {open:"“Em lấy đúng một tình huống ở kho: ca đêm kết thúc lúc 6 giờ sáng, có công nhân thiếu log ra. Mời anh/chị xem tình huống đó đi qua hệ thống thế nào.”", screen:"Dashboard OneNow — lọc theo kho mẫu, nhìn mục phiếu chờ duyệt và phiếu quá hạn SLA.", action:"Mở phiếu giải trình công của ca đêm đó trong Approvals, đối chiếu lý do giải trình, bấm Duyệt.", result:"Chỉ vào trạng thái Applied và lượt chấm công vừa được bổ sung trong Kết quả chấm công — có tên người duyệt, có thời điểm duyệt.", close:"“Cách xử lý thiếu log này áp vào các kho của anh/chị thì bước nào bắt buộc phải khác đi?”"},
- {open:"“Trước kỳ lương, việc C&B sợ nhất là OT ca đêm chưa ai xác nhận mà vẫn lọt vào lương. Em cho anh/chị xem lớp kiểm tra đó.”", screen:"Kết quả chấm công theo kho — danh sách ca đêm và tăng ca của kỳ.", action:"Lọc danh sách tăng ca theo trạng thái đã duyệt / chưa duyệt theo từng kho, đối chiếu các ca bất thường nổi lên.", result:"Chỉ vào danh sách OT đã duyệt — đây là danh sách duy nhất được đưa vào kỳ lương ở bài sau.", close:"“Ở kho của anh/chị, ai là người cuối cùng xác nhận OT ca đêm — trưởng kho hay điều phối?”"},
- {open:"“Giờ em nối ba thứ đã duyệt — công, OT ca đêm, phụ cấp tuyến — vào một kỳ lương nhỏ để anh/chị xem cách C&B kiểm tra trước khi chốt.”", screen:"Tính lương — kỳ lương phạm vi nhỏ của kho mẫu, mở chi tiết một nhân viên có phụ cấp tuyến.", action:"Chạy kiểm tra kỳ lương, mở danh sách sai lệch, mở chi tiết phụ cấp tuyến và OT ca đêm của nhân viên mẫu.", result:"Chỉ vào phiếu lương chi tiết từng khoản — nhân viên tự đối chiếu được thay vì hỏi lại C&B.", close:"“Nếu kỳ lương thật của anh/chị chạy kiểm tra ra danh sách lệch như thế này trước khi chốt, C&B còn cần rà tay phần nào nữa?”"}
+ {open:"Mở đầu: Anh chị đang mất bao nhiêu ngày để gom công 3 kho về trung tâm, và thiếu log thường phát hiện lúc nào?", screen:"Mở Dashboard, chỉ phiếu chờ duyệt và phiếu quá hạn SLA theo từng kho", action:"Mở phiếu giải trình công của một tài xế giao muộn, kiểm tra log ra/vào", result:"Duyệt và chỉ trạng thái Applied cùng lượt chấm công đã bổ sung có dấu vết", close:"Hỏi chốt: Với cách này, quy trình giải trình công của anh chị có điểm nào bắt buộc khác đi không?"},
+ {open:"Mở đầu: Phụ cấp ca đêm hiện tính theo tuyến hay tính chung một mức cho mọi tuyến?", screen:"Mở kết quả chấm công ca đêm của một tài xế, chỉ giờ tăng ca", action:"Chỉ phụ cấp theo tuyến và cách đối chiếu với giờ tăng ca", result:"Chạy kiểm tra lương cho phạm vi demo nhỏ, chỉ một trường hợp sai lệch", close:"Hỏi chốt: Cách đối chiếu này đã khớp với cách tính phụ cấp của anh chị chưa?"},
+ {open:"Mở đầu: Kỳ lương vừa rồi có trường hợp nào phải sửa sau khi trả không, và sửa mất bao lâu?", screen:"Mở bảng kiểm tra lương cho phạm vi demo nhỏ", action:"Chỉ một trường hợp sai lệch và cách sửa trước khi chốt", result:"Phát hành phiếu lương mẫu, chỉ phiếu lương khớp với công đã duyệt", close:"Hỏi chốt: Anh chị cần thêm bước kiểm tra nào nữa trước khi chốt thật?"}
 ],
 fnb:[
- {open:"“Em lấy bối cảnh một tối thứ Sáu ở cửa hàng: giờ cao điểm, một bạn thiếu log vào ca. Mời anh/chị xem quản lý cửa hàng xử lý việc đó ngay trong kỳ, không chờ cuối tháng.”", screen:"Dashboard theo cửa hàng mẫu — chấm công theo ca của ngày hôm nay.", action:"Mở phiếu giải trình công của ca tối trong Approvals bằng tài khoản quản lý cửa hàng, bấm Duyệt.", result:"Chỉ vào trạng thái Applied và công theo ca đã hoàn thiện của cửa hàng — quản lý vùng nhìn thấy cùng một dữ liệu.", close:"“Ở cửa hàng của anh/chị, đổi ca và thiếu log đang xử lý qua kênh nào — có để lại dấu vết duyệt như thế này không?”"},
- {open:"“Tình huống thứ hai rất quen ở chuỗi: một bạn bán thời gian báo nghỉ đột xuất. Điều mọi người cần chắc chắn là số dư phép chạy đúng.”", screen:"ESS trên điện thoại — phiếu nghỉ của nhân viên mẫu; chuyển sang Approvals của quản lý.", action:"Duyệt phiếu nghỉ, quay lại ESS kiểm tra số dư phép; sau đó thử từ chối một phiếu khác để khách thấy số dư tăng lại.", result:"Chỉ vào số dư phép trước và sau mỗi thao tác — giảm đúng khi duyệt, tăng lại đúng khi từ chối hoặc hủy.", close:"“Quản lý cửa hàng của anh/chị duyệt nghỉ như vậy có nhanh hơn quy trình nhóm chat hiện tại không?”"},
- {open:"“Cuối cùng em nối công theo ca vào lương theo giờ, rồi cho anh/chị xem một bạn mới đi từ ứng viên thành nhân viên có ca đầu tiên.”", screen:"Tính lương theo ca của cửa hàng mẫu; chuyển sang Tuyển dụng — hồ sơ ứng viên mẫu.", action:"Kiểm tra chi tiết lương theo giờ của một bạn bán thời gian, rồi đi tiếp nhận ứng viên thành hồ sơ nhân viên kèm tài khoản ESS.", result:"Chỉ vào phiếu lương theo ca và hồ sơ nhân viên mới — đủ hợp đồng, đủ tài khoản ngay trước ca đầu tiên.", close:"“Tốc độ tiếp nhận như vậy đáp ứng được nhịp mở cửa hàng và bổ sung ca cuối tuần của chuỗi chưa?”"}
+ {open:"Mở đầu: Ca bán hàng thiếu người thì cửa hàng biết bằng cách nào, và thường biết lúc nào?", screen:"Mở Dashboard theo cửa hàng, chỉ cửa hàng đang thiếu người", action:"Mở phiếu giải trình thiếu log của ca bán hàng", result:"Duyệt và chỉ log đã bổ sung, ca đã đủ người", close:"Hỏi chốt: Quy trình xoay ca khi thiếu người của anh chị có bước nào bắt buộc khác không?"},
+ {open:"Mở đầu: Số dư phép của nhân viên hiện khớp với quyết định duyệt hay vẫn tính tay riêng?", screen:"Nhân viên nộp nghỉ trên ESS", action:"Quản lý cửa hàng duyệt trên Approvals", result:"Chỉ số dư trước và sau duyệt: giảm khi duyệt, tăng lại khi từ chối", close:"Hỏi chốt: Quy tắc duyệt nghỉ và đổi ca của anh chị có gì bắt buộc khác không?"},
+ {open:"Mở đầu: Lương bán thời gian hiện tính theo ca hay tính chung, và sai một ca thì xử lý thế nào?", screen:"Mở kết quả chấm công theo ca của một nhân viên bán thời gian", action:"Chỉ phụ cấp theo cửa hàng và giờ làm theo ca", result:"Chạy kiểm tra lương cho phạm vi demo, chỉ một trường hợp sai lệch", close:"Hỏi chốt: Cách tính lương theo ca của anh chị có điểm nào bắt buộc khác không?"}
 ],
 hotel:[
- {open:"“Em bắt đầu ở ca rủi ro nhất của khách sạn: Lễ tân ca đêm, 2 giờ sáng, một nhân viên thiếu log. Mời anh/chị xem ca đó được giải trình và duyệt thế nào.”", screen:"Dashboard — phiếu chờ duyệt và quá hạn SLA, lọc theo bộ phận Lễ tân.", action:"Mở phiếu giải trình công ca đêm trong Approvals bằng tài khoản trưởng bộ phận, bấm Duyệt.", result:"Chỉ vào trạng thái Applied và lượt công bổ sung của ca đêm — ca gối nhau vẫn truy vết được người duyệt.", close:"“Ở khách sạn của anh/chị, công ca đêm hiện do ai xác nhận — trưởng ca hay HR sáng hôm sau?”"},
- {open:"“Tình huống thứ hai là mùa cao điểm: hai nhân viên cùng bộ phận xin nghỉ trùng một ngày đông khách. Vấn đề không chỉ là duyệt, mà là đừng để hụt ca.”", screen:"ESS — hai phiếu nghỉ trùng ngày; Approvals theo phạm vi bộ phận Buồng phòng.", action:"Duyệt một phiếu, kiểm tra số dư phép của nhân viên đó; cho khách thấy phiếu còn lại nằm trong hàng đợi của đúng trưởng bộ phận.", result:"Chỉ vào số dư phép biến động đúng và danh sách phiếu theo bộ phận — mỗi bộ phận tự chịu trách nhiệm ca trực của mình.", close:"“Cách duyệt theo bộ phận này có giúp trưởng bộ phận của anh/chị tránh nghỉ chồng chéo trong mùa cao điểm không?”"},
- {open:"“Bài cuối là kỳ lương mùa cao điểm — nơi tăng ca lễ và service charge quyết định niềm tin của nhân viên thời vụ.”", screen:"Tính lương — kỳ lương nhỏ có tăng ca lễ; mở chi tiết một nhân viên thời vụ.", action:"Chạy kiểm tra kỳ lương, mở khoản tăng ca lễ và service charge trong phiếu lương chi tiết; mở danh sách hợp đồng thời vụ sắp hết hạn.", result:"Chỉ vào căn cứ từng khoản trong phiếu lương và danh sách hợp đồng cần tái ký trước khi hết hạn giữa mùa vụ.", close:"“Nếu nhân viên thời vụ tự đối chiếu được căn cứ service charge như thế này, số thắc mắc sau ngày lương của HR sẽ thay đổi ra sao?”"}
+ {open:"Mở đầu: Ca đêm thiếu người thì bộ phận biết bằng cách nào, và thường biết lúc nào?", screen:"Mở Dashboard theo bộ phận, chỉ bộ phận đang thiếu log ca đêm", action:"Mở phiếu giải trình thiếu log ca đêm", result:"Duyệt và chỉ log đã bổ sung, ca đã đủ người", close:"Hỏi chốt: Quy trình giải trình ca đêm của anh chị có bước nào bắt buộc khác không?"},
+ {open:"Mở đầu: Mùa cao điểm anh chị duyệt nghỉ theo nguyên tắc nào để không thiếu người phục vụ?", screen:"Nhân viên nộp nghỉ trên ESS", action:"Trưởng bộ phận duyệt trên Approvals", result:"Chỉ số dư trước và sau duyệt: giảm khi duyệt, tăng lại khi từ chối", close:"Hỏi chốt: Nguyên tắc duyệt nghỉ mùa cao điểm của anh chị có gì bắt buộc khác không?"},
+ {open:"Mở đầu: Kỳ lễ vừa rồi có trường hợp tăng ca nào phải sửa sau trả không?", screen:"Mở bảng kiểm tra lương tăng ca lễ, chỉ phụ cấp ca đêm", action:"Chỉ một trường hợp sai lệch và cách sửa trước chốt", result:"Mở hợp đồng thời vụ sắp hết hạn và quy trình tái ký", close:"Hỏi chốt: Anh chị cần thêm bước kiểm tra nào trước khi chốt lương lễ?"}
 ],
 manufacturing:[
- {open:"“Em bắt đầu lúc 6 giờ sáng, ca đêm nhà máy kết thúc: tổ trưởng có vài công nhân thiếu log ở cổng. Mời anh/chị xem khâu xác nhận đó đi vào hệ thống.”", screen:"Dashboard — phiếu chờ duyệt theo nhà máy và ca; danh sách giải trình công của tổ mẫu.", action:"Mở phiếu giải trình công ca đêm trong Approvals bằng tài khoản tổ trưởng, bấm Duyệt.", result:"Chỉ vào trạng thái Applied và công của tổ đã hoàn thiện trong kỳ — không còn tờ giấy xác nhận đi lòng vòng.", close:"“Ở nhà máy của anh/chị, tổ trưởng xác nhận công như vậy thay cho giấy thì khâu nào còn vướng?”"},
- {open:"“Tình huống thứ hai là đợt tái ký: hàng chục hợp đồng cùng hết hạn trong một tháng. Em cho anh/chị xem cách nhìn thấy đợt đó trước, không phải khi đã quá hạn.”", screen:"Hồ sơ nhân viên — danh sách hợp đồng sắp hết hạn theo đợt; ESS — phiếu nghỉ theo ca sản xuất.", action:"Lọc hợp đồng sắp hết hạn theo nhà máy, mở một hồ sơ mẫu; duyệt một phiếu nghỉ theo ca và kiểm tra số dư phép.", result:"Chỉ vào danh sách tái ký theo đợt và số dư phép biến động đúng sau duyệt — hai việc nằm trên cùng một hồ sơ nhân viên.", close:"“Đợt tái ký gần nhất của nhà máy là tháng nào, và hiện ai đang theo dõi danh sách đó bằng cách nào?”"},
- {open:"“Bài cuối nối công và OT đã duyệt của một tổ vào kỳ lương — với ba khoản phụ cấp nhạy cảm nhất: ca đêm, độc hại và chuyên cần.”", screen:"Tính lương — kỳ lương nhỏ của tổ mẫu; công thức lương 23 thành phần.", action:"Chạy kiểm tra kỳ lương của tổ, mở danh sách sai lệch, mở chi tiết phụ cấp của một công nhân.", result:"Chỉ vào phiếu lương chi tiết từng khoản phụ cấp — công nhân đối chiếu được giờ OT và phụ cấp của chính mình.", close:"“Danh sách sai lệch kiểm tra trước chốt này có đúng dạng sai lệch C&B nhà máy thường gặp mỗi kỳ không?”"}
+ {open:"Mở đầu: Công bất thường theo chuyền hiện phát hiện bằng cách nào, và thường phát hiện lúc nào?", screen:"Mở Dashboard theo nhà máy, chỉ chuyền đang có công bất thường", action:"Mở phiếu giải trình công bất thường", result:"Duyệt và chỉ log đã bổ sung", close:"Hỏi chốt: Quy trình xử lý công bất thường của anh chị có bước nào bắt buộc khác không?"},
+ {open:"Mở đầu: Hợp đồng sắp hết hạn hiện theo dõi bằng gì, và có bao giờ sót tái ký chưa?", screen:"Mở danh sách hợp đồng sắp hết hạn theo chuyền", action:"Nhân viên nộp nghỉ trên ESS và quản lý duyệt", result:"Chỉ số dư trước và sau duyệt", close:"Hỏi chốt: Quy trình tái ký và duyệt nghỉ theo ca của anh chị có gì bắt buộc khác không?"},
+ {open:"Mở đầu: Tăng ca theo đơn hàng hiện tính và đối chiếu như thế nào, và sai một ca thì xử lý ra sao?", screen:"Mở kết quả chấm công tăng ca theo chuyền", action:"Mở bảng kiểm tra lương cho phạm vi demo, chỉ một trường hợp sai lệch", result:"Phát hành phiếu lương mẫu, chỉ phiếu khớp với công đã duyệt", close:"Hỏi chốt: Anh chị cần thêm bước kiểm tra nào trước khi chốt lương thật?"}
 ]};
 
 var BEFORE_AFTER = {
 logistics:[
- {before:"Mỗi kho gửi file công về trung tâm cuối tuần; thiếu log phát hiện khi file đã gộp, phải hỏi ngược lại từng kho.", after:"Phiếu giải trình công được duyệt ngay tại điểm phát sinh trên Approvals; duyệt xong ghi Applied và bổ sung log — trung tâm nhìn thấy tiến độ theo kho trên Dashboard."},
- {before:"OT ca đêm nằm rải trong file của từng kho, C&B rà soát toàn bộ vào cuối kỳ mới biết ca nào chưa được xác nhận.", after:"OT chỉ vào lương khi đã duyệt; danh sách ca đêm / tăng ca bất thường được đối chiếu theo kho trước kỳ lương."},
- {before:"Phụ cấp tuyến mỗi kho tính một biểu; sai lệch thường lộ ra khi tài xế nhận lương và thắc mắc.", after:"Kỳ lương chạy kiểm tra trên phạm vi nhỏ trước: chi tiết phụ cấp tuyến và sai lệch hiện ra trước khi chốt và phát hành phiếu lương."}
+ {before:"Trước: mỗi kho gửi file riêng, công về chậm 1–2 ngày; thiếu log chỉ phát hiện cuối tháng, HR phải gọi từng kho xác minh rồi sửa tay trong bảng công, không có dấu vết ai sửa.", after:"Sau: công tập trung trên Dashboard, thiếu log hiện ngay trong ngày; giải trình có người duyệt, trạng thái Applied rõ ràng, lượt chấm công bổ sung có dấu vết đầy đủ."},
+ {before:"Trước: tính phụ cấp tay theo tuyến trên bảng tính, nhầm một mức là khiếu nại kéo dài cả tháng, C&B phải đối chiếu lại từng người.", after:"Sau: phụ cấp gắn với ca và tuyến, đối chiếu ngay trên kết quả chấm công; kiểm tra được trước khi chốt lương."},
+ {before:"Trước: chốt rồi mới phát hiện sai, sửa sau khi trả lương vừa tốn công vừa mất niềm tin, nhân viên tra phiếu thấy không khớp công.", after:"Sau: kiểm tra trước chốt trên dữ liệu đã duyệt, phát hành phiếu lương khi mọi sai lệch đã sửa xong."}
 ],
 fnb:[
- {before:"Đổi ca qua nhóm chat, chấm công mỗi cửa hàng một file; cuối tháng HR mới phát hiện thiếu log và ca chồng chéo.", after:"Công theo cửa hàng và ca hiện trên Dashboard trong kỳ; giải trình và đổi ca có người duyệt, có dấu vết Applied."},
- {before:"Xin nghỉ qua nhiều kênh; duyệt xong số dư phép không khớp khiến nhân viên và C&B phải đối chiếu lại bằng tay.", after:"Phiếu nghỉ đi từ ESS tới Approvals; số dư phép giảm đúng khi duyệt, tăng lại đúng khi từ chối hoặc hủy — nhân viên tự tra trên ESS."},
- {before:"Lương bán thời gian cộng giờ thủ công từng cửa hàng; tuyển nhân viên mới chậm vì hồ sơ làm rời rạc sau khi đã vào ca.", after:"Lương theo ca được kiểm tra trước khi chốt trong phạm vi một cửa hàng; ứng viên đi trọn luồng tới hồ sơ nhân viên và tài khoản ESS trước ca đầu tiên."}
+ {before:"Trước: mỗi cửa hàng chấm công một kiểu, ca thiếu người chỉ biết khi đã đến giờ bán; đổi ca, thiếu log dồn về HR cuối tháng.", after:"Sau: ca và công rõ theo từng cửa hàng, thiếu log xử lý trong ngày, quản lý xoay ca kịp trước giờ bán hàng."},
+ {before:"Trước: nghỉ đột xuất và đổi ca duyệt miệng, số dư tính tay không khớp, nhân viên tranh cãi vì thấy số dư sai.", after:"Sau: nghỉ và đổi ca có duyệt trên hệ thống, số dư chạy đúng theo duyệt, từ chối và hủy."},
+ {before:"Trước: lương bán thời gian tính tay theo ca, sai một ca là nhân viên phản ứng ngay, nhóm vào ra liên tục nên dễ mất người.", after:"Sau: lương theo ca thực tế và phụ cấp đúng cửa hàng, kiểm tra trước chốt, nhân viên tra phiếu thấy khớp ca đã làm."}
 ],
 hotel:[
- {before:"Thiếu log ca đêm chỉ lộ ra khi nhân viên thắc mắc lương; trưởng bộ phận và HR phải rà lại lịch ca giấy.", after:"Ca thiếu log có phiếu giải trình và người duyệt theo bộ phận ngay trong kỳ, trạng thái Applied truy vết được kể cả ca đêm."},
- {before:"Nghỉ mùa cao điểm duyệt rời rạc từng bộ phận; hụt ca trực phát hiện sát giờ, số dư phép đối chiếu lại sau mùa vụ.", after:"Phiếu nghỉ duyệt theo bộ phận trên Approvals, số dư phép biến động đúng theo duyệt / từ chối / hủy và tra được trên ESS."},
- {before:"Tăng ca lễ và service charge tính cuối tháng theo file riêng; hợp đồng thời vụ hết hạn giữa mùa vụ dễ bị sót.", after:"Tăng ca lễ đã duyệt vào kỳ lương kiểm tra trước khi chốt, phiếu lương chi tiết căn cứ từng khoản; hợp đồng sắp hết hạn hiện thành danh sách tái ký."}
+ {before:"Trước: ca 24/7 theo bộ phận rời rạc, thiếu log ca đêm biết muộn, xếp người dọn phòng bị động, khách check-in trễ.", after:"Sau: ca tập trung theo bộ phận, thiếu log xử lý trong ngày có duyệt, ca đêm đủ người trước giờ cao điểm."},
+ {before:"Trước: nghỉ mùa cao điểm duyệt tay, không theo bộ phận nên dễ thiếu người phục vụ lúc khách đông, duyệt theo cảm tính.", after:"Sau: nghỉ có duyệt theo bộ phận, số dư đúng, mùa cao điểm vẫn đủ người phục vụ."},
+ {before:"Trước: tăng ca lễ và phụ cấp ca đêm tính tay dễ sai, hợp đồng thời vụ theo dõi tay, đến hạn mới biết sót tái ký.", after:"Sau: lương lễ và ca đêm kiểm tra trước chốt, hợp đồng thời vụ có nhắc tái ký, không sót hạn."}
 ],
 manufacturing:[
- {before:"Tổ trưởng xác nhận công bằng giấy / Excel theo ca; giấy về HR chậm, công bất thường rà lại từng ca khi đã sát ngày lương.", after:"Giải trình công được tổ trưởng duyệt trên Approvals ngay trong kỳ, trạng thái Applied bổ sung log — HR nhà máy thấy công hoàn thiện theo ca, theo tổ."},
- {before:"Đợt tái ký lớn theo dõi bằng danh sách riêng; nghỉ phép không gắn với ca sản xuất gây hụt người trên dây chuyền.", after:"Hợp đồng sắp hết hạn hiện theo đợt trong hồ sơ nhân viên; nghỉ phép duyệt theo ca, số dư phép biến động đúng cả ba hướng."},
- {before:"C&B tổng hợp lương nhiều ngày cho cả nhà máy; sai phụ cấp của một tổ thường chỉ rõ sau ngày trả lương và thành thắc mắc tập thể.", after:"Kỳ lương chạy kiểm tra trước trên phạm vi một tổ: phụ cấp ca đêm, độc hại, chuyên cần và sai lệch hiện ra trước khi chốt; công nhân có phiếu lương chi tiết để tự đối chiếu."}
+ {before:"Trước: công theo nhà máy rời rạc, công bất thường theo chuyền biết muộn, đến kỳ lương mới phát hiện sai.", after:"Sau: công tập trung theo nhà máy, công bất thường xử lý trong ngày có duyệt và dấu vết."},
+ {before:"Trước: hợp đồng theo dõi tay dễ sót tái ký, nghỉ theo ca duyệt không đều giữa các chuyền, số dư phép không khớp.", after:"Sau: hợp đồng có nhắc tái ký, nghỉ theo ca có duyệt và số dư đúng, rõ theo từng chuyền."},
+ {before:"Trước: tăng ca và phụ cấp tính tay, sai một ca là cả chuyền phản ứng, sửa sau khi trả vừa tốn công vừa mất niềm tin.", after:"Sau: lương theo công thực tế, tăng ca và phụ cấp đúng, kiểm tra trước chốt, phiếu lương khớp ca đã làm."}
 ]};
 
 var HEALTH_CHECKS = [
@@ -950,7 +1097,7 @@ var ROLES = [
   {who:"C&B", t:"Công → Lương → Kiểm tra → Phiếu lương", d:"Luồng khép kín từ kết quả chấm công và phép đã duyệt vào công thức lương 23 thành phần, kiểm tra sai lệch trước khi chốt, rồi phát hành phiếu lương.", show:"Chấm công · Tính lương · Phiếu lương"},
   {who:"Recruitment", t:"Yêu cầu → Ứng viên → Phỏng vấn → Tiếp nhận", d:"Luồng tuyển dụng trọn vòng tới tiếp nhận thành hồ sơ nhân viên — đặc biệt thuyết phục với ngành biến động nhân sự cao như F&B và Hotel mùa vụ.", show:"Tuyển dụng · Ứng viên · Tiếp nhận"},
   {who:"IT", t:"SSO, RBAC, kiến trúc, triển khai", d:"333 quyền RBAC, SSO, kiến trúc ASP.NET Core 8 + React + SQL Server trên Windows/IIS, API, backup và phương án triển khai — chỉ đi sâu khi người nghe là IT.", show:"Phân quyền RBAC · SSO · Kiến trúc · Backup"},
-  {who:"Finance / Procurement", t:"Tổng chi phí sở hữu & ROI", d:"Khung phạm vi license, triển khai, bảo trì và chi phí phát sinh. Giá cụ thể theo đề xuất thương mại riêng — thuyết minh sản phẩm không công bố giá, không tự nêu số trong buổi demo.", show:"Phạm vi · License · Bảo trì · ROI (khung)"}
+  {who:"Finance / Procurement", t:"Tổng chi phí sở hữu & ROI", d:"Khung phạm vi giấy phép, triển khai, bảo trì và chi phí phát sinh. Giá cụ thể theo đề xuất thương mại riêng — thuyết minh sản phẩm không công bố giá, không tự nêu số trong buổi demo.", show:"Phạm vi · Giấy phép · Bảo trì · ROI (khung)"}
 ];
 
 var SEGMENTS = [
@@ -982,7 +1129,7 @@ var SCORES = [
 var FIT_LABEL = {ready:"Đáp ứng sẵn", config:"Đáp ứng qua cấu hình", dev:"Cần phát triển thêm", no:"Chưa đáp ứng"};
 var ADV_STEPS = ["Xác nhận phạm vi triển khai","Workshop chuyên sâu theo bài toán","Chạy PoC với dữ liệu mẫu của khách","Gửi đề xuất thương mại","Trình phương án với Ban Giám đốc"];
 
-var state = { ind:"logistics", checked:{}, healthChecked:{}, scores:[0,0,0,0,0], autoScoreExp:[], timerSec:3600, timerRun:false, seg:0, fitCache:{}, prioCache:{}, scenCache:{}, prioSelCache:{}, profiles:[], activeProfileId:null, discNotes:{}, estCache:{}, storyTimers:[{sec:600,run:false},{sec:600,run:false},{sec:600,run:false}] };
+var state = { ind:"logistics", checked:{}, healthChecked:{}, scores:[0,0,0,0,0], autoScoreExp:[], timerSec:3600, timerRun:false, seg:0, fitCache:{}, prioCache:{}, prioDescCache:{}, scenCache:{}, prioSelCache:{}, profiles:[], activeProfileId:null, discNotes:{}, estCache:{}, storyTimers:[{sec:600,run:false},{sec:600,run:false},{sec:600,run:false}] };
 
 function deepClone(o){ return JSON.parse(JSON.stringify(o)); }
 function buildFitRows(ind){
@@ -1085,9 +1232,12 @@ function convertServerProfile(full){
     id: full.id, _serverId: full.id, _fullLoaded: true,
     name: full.name, industry: ind,
     locations: String(full.locations), headcount: String(full.employeeCount),
+    aiSuggestionRequested: !!full.aiSuggestionRequested, aiSuggestionRequestedAt: full.aiSuggestionRequestedAt,
+    companyResearchRequested: !!full.companyResearchRequested, companyResearchRequestedAt: full.companyResearchRequestedAt, companyResearchNote: full.companyResearchNote || "",
     isDefault: !!full.isDefault, isDemoSample: !!full.isDemoSample,
     scenarios: (full.scenarios||[]).map(function(s,i){ return {t:s.title, mins:"Bài "+(i+1)+" · 10 phút", pain:s.pain||"", sol:s.solution||"", out:s.outcome||"", val:s.value||"", flow:(s.screenFlow ? s.screenFlow.split(" -> ") : []), _serverId:s.id, _story:s.storySteps||"", _storyEdited:!!s.storyEdited, _edited:!!s.storyEdited, _before:s.beforeText||"", _after:s.afterText||""}; }),
     prio: (full.priorities||[]).map(function(x){ return x.title; }),
+    prioDesc: (full.priorities||[]).map(function(x){ return x.description||""; }),
     prioSel: (full.priorities||[]).map(function(x){ return x.confirmedStatus||""; }),
     fitRows: (full.fitGap||[]).map(function(f){ return {req:f.requirement, status:FIT_CODE[f.status]||"ready", note:f.note||"", hint:"", followOwner:f.followOwner||"", followDue:f.followDue||"", _serverId:f.id}; })
   };
@@ -1116,23 +1266,32 @@ function convertServerProfile(full){
   return p;
 }
 function loadServerProfiles(){
+  var opened=activeProfile();
   return apiFetch("/api/profiles").then(function(list){
     state.profiles = (list||[]).map(function(x){
+      if(opened && opened._fullLoaded && opened.id===x.id) return opened;
       var ind = SERVER_IND[x.industry] || "logistics";
-      return {id:x.id, _serverId:x.id, _fullLoaded:false, name:x.name, industry:ind, locations:String(x.locations), headcount:String(x.employeeCount), isDefault:!!x.isDefault, isDemoSample:!!x.isDemoSample};
+      return {id:x.id, _serverId:x.id, _fullLoaded:false, aiSuggestionRequested:!!x.aiSuggestionRequested, aiSuggestionRequestedAt:x.aiSuggestionRequestedAt, companyResearchRequested:!!x.companyResearchRequested, companyResearchRequestedAt:x.companyResearchRequestedAt, companyResearchNote:x.companyResearchNote||"", name:x.name, industry:ind, locations:String(x.locations), headcount:String(x.employeeCount), isDefault:!!x.isDefault, isDemoSample:!!x.isDemoSample};
     });
     renderProfiles();
     if(window.updateFlow) window.updateFlow();
   }).catch(function(e){ apiErr(e); });
 }
-function openServerProfile(serverId){
+function openServerProfile(serverId, canApply){
   return apiFetch("/api/profiles/"+serverId).then(function(full){
+    if(canApply && !canApply()) return null;
+    if(canApply && _profileWatch){
+      _profileWatch.local=profileEditData(activeProfile());
+      _profileWatch.localFlagsAi=activeProfile().aiSuggestionRequested;
+      _profileWatch.localFlagsResearch=activeProfile().companyResearchRequested;
+    }
     var p = convertServerProfile(full);
     var found = false;
     for(var i=0;i<state.profiles.length;i++){ if(state.profiles[i].id===serverId || state.profiles[i]._serverId===serverId){ state.profiles[i]=p; found=true; } }
     if(!found) state.profiles.push(p);
     state.activeProfileId = serverId;
     state.ind = p.industry;
+    loadDemoSlides(serverId);
     return p;
   });
 }
@@ -1161,7 +1320,7 @@ function syncProfile(p){
   var prioIds = state._prioIdsByProfile[p._serverId] || [];
   (p.prio||[]).forEach(function(title, i){
     var pid = prioIds[i];
-    if(pid) chain = chain.then(function(){ return apiFetch("/api/profiles/"+p._serverId+"/priorities/"+pid, "PUT", {title:title, description:"", confirmedStatus:(p.prioSel&&p.prioSel[i])||""}); }).catch(function(){ return null; });
+    if(pid) chain = chain.then(function(){ return apiFetch("/api/profiles/"+p._serverId+"/priorities/"+pid, "PUT", {title:title, description:(p.prioDesc && p.prioDesc[i]!=null) ? p.prioDesc[i] : (INDUSTRIES[p.industry].priorities[i].description||""), confirmedStatus:(p.prioSel&&p.prioSel[i])||""}); }).catch(function(){ return null; });
   });
   (p.scenarios||[]).forEach(function(sc, i){
     var sid = (state._scenIdsByProfile[p._serverId]||[])[i];
@@ -1224,6 +1383,15 @@ function getPrio(ind){
   if(!state.prioCache[ind]) state.prioCache[ind]=INDUSTRIES[ind].scenarios.map(function(s){return s.t;});
   return state.prioCache[ind];
 }
+function getPrioDesc(ind){
+  var p=activeProfile();
+  if(p && p.industry===ind){
+    if(!p.prioDesc) p.prioDesc=INDUSTRIES[ind].priorities.map(function(x){return x.description||"";});
+    return p.prioDesc;
+  }
+  if(!state.prioDescCache[ind]) state.prioDescCache[ind]=INDUSTRIES[ind].priorities.map(function(x){return x.description||"";});
+  return state.prioDescCache[ind];
+}
 function getPrioSel(ind){
   var p=activeProfile();
   if(p && p.industry===ind) return p.prioSel;
@@ -1260,7 +1428,7 @@ function renderIndustries(){
     return '<button class="ind-card'+(state.ind===o[0]?' active':'')+'" data-ind="'+o[0]+'"><span class="ind-ico">'+svgIcon(o[1])+'</span><h3>'+d.name+'</h3><p>'+d.desc+'</p><span class="tag">'+d.sub+'</span></button>';
   }).join("");
   var cards=document.querySelectorAll(".ind-card");
-  for(var i=0;i<cards.length;i++){ cards[i].addEventListener("click",function(){ var ni=this.getAttribute("data-ind"); var p=activeProfile(); if(p&&p.industry!==ni){ state.activeProfileId=null; saveProfiles(); } state.ind=ni; applyContext(); }); }
+  for(var i=0;i<cards.length;i++){ cards[i].addEventListener("click",function(){ var ni=this.getAttribute("data-ind"); var p=activeProfile(); if(p&&p.industry!==ni){ el("profName").value=""; state.activeProfileId=null; saveProfiles(); } state.ind=ni; applyContext(); }); }
   var d=INDUSTRIES[state.ind];
   el("indBanner").innerHTML = '<div><h3>Ngành đang chọn: '+d.name+' — '+d.sub+'</h3><p>'+d.desc+'</p><p style="margin-top:8px"><b>Gợi ý Discovery riêng cho ngành:</b> '+d.discHint+'</p></div><div><b style="font-size:13px;letter-spacing:.05em">ĐẶC THÙ NGÀNH (GIẢ ĐỊNH DỰNG DEMO)</b><ul>'+d.traits.map(function(x){return "<li>"+x+"</li>"}).join("")+'</ul></div>';
   renderIndDetail();
@@ -1286,24 +1454,28 @@ function renderDiscovery(){
   el("discGrid").innerHTML = DISCOVERY.map(function(g,i){
     var qs=(deep&&deep.disc&&deep.disc[i])?deep.disc[i]:g.qs;
     var val=(notes[i]||"").replace(/</g,"&lt;");
-    return '<div class="card"><span class="disc-num">'+g.n+' · RIÊNG CHO NGÀNH '+INDUSTRIES[state.ind].name.toUpperCase()+'</span><h3>'+g.t+'</h3><ul>'+qs.map(function(q){return "<li>"+q+"</li>"}).join("")+'</ul><label class="f">Ghi câu trả lời của khách</label><textarea class="disc-note" data-g="'+i+'" placeholder="Ghi ngắn gọn, đúng lời khách…">'+val+'</textarea></div>';
+    return '<div class="card"><span class="disc-num">'+g.n+' · RIÊNG CHO NGÀNH '+INDUSTRIES[state.ind].name.toUpperCase()+'</span><h3>'+g.t+'</h3><ul>'+qs.map(function(q){return "<li>"+q+"</li>"}).join("")+'</ul><div class="disc-answer"><label class="f">Ghi câu trả lời của khách</label><textarea class="disc-note" data-g="'+i+'" placeholder="Ghi ngắn gọn, đúng lời khách…">'+val+'</textarea></div></div>';
   }).join("");
   var dns=document.querySelectorAll(".disc-note");
   for(var di=0;di<dns.length;di++){ dns[di].addEventListener("input",function(){ getDiscNotes()[this.getAttribute("data-g")]=this.value; touchProfile(); }); }
-  var prio=getPrio(state.ind), sels=getPrioSel(state.ind);
+  var prio=getPrio(state.ind), descs=getPrioDesc(state.ind), sels=getPrioSel(state.ind);
   el("prio").innerHTML = prio.map(function(t,i){
-    return '<div class="card"><span class="disc-num">ƯU TIÊN '+(i+1)+' · GỢI Ý SẴN THEO NGÀNH — SỬA ĐƯỢC</span><label class="f">Vấn đề ưu tiên</label><input type="text" class="prio-text" data-i="'+i+'" value="'+t.replace(/"/g,'&quot;')+'"><label class="f">Xác nhận mức ưu tiên</label><select class="prio-sel" data-i="'+i+'"><option value=""'+(sels[i]===""?' selected':'')+'>— Chưa xác nhận —</option><option value="1"'+(sels[i]==="1"?' selected':'')+'>Đã chốt ở Discovery</option><option value="0"'+(sels[i]==="0"?' selected':'')+'>Khách chưa xác nhận</option></select></div>';
+    return '<div class="card"><span class="disc-num">ƯU TIÊN '+(i+1)+' · GỢI Ý SẴN THEO NGÀNH — SỬA ĐƯỢC</span><label class="f">Vấn đề ưu tiên</label><input type="text" class="prio-text" data-i="'+i+'" value="'+t.replace(/"/g,'&quot;')+'"><label class="f">Mô tả vấn đề ưu tiên</label><textarea class="prio-desc" data-i="'+i+'">'+(descs[i]||"").replace(/&/g,"&amp;").replace(/</g,"&lt;")+'</textarea><label class="f">Xác nhận mức ưu tiên</label><select class="prio-sel" data-i="'+i+'"><option value=""'+(sels[i]===""?' selected':'')+'>— Chưa xác nhận —</option><option value="1"'+(sels[i]==="1"?' selected':'')+'>Đã chốt ở Discovery</option><option value="0"'+(sels[i]==="0"?' selected':'')+'>Khách chưa xác nhận</option></select></div>';
   }).join("");
   var ps=document.querySelectorAll(".prio-sel");
   for(var i=0;i<ps.length;i++){ ps[i].addEventListener("change",function(){ getPrioSel(state.ind)[parseInt(this.getAttribute("data-i"),10)]=this.value; touchProfile(); checkPrio(); }); }
   var pt=document.querySelectorAll(".prio-text");
   for(var j=0;j<pt.length;j++){ pt[j].addEventListener("input",function(){ var idx=parseInt(this.getAttribute("data-i"),10); var oldPrio=getPrio(state.ind)[idx]; getPrio(state.ind)[idx]=this.value; var scens=getScenarios(state.ind); if(scens[idx] && scens[idx].t===oldPrio){ scens[idx].t=this.value; scens[idx]._edited=true; scens[idx]._storyEdited=true; scens[idx]._story=derivedStory(scens[idx]); } touchProfile(); renderPresenterSummary(); }); }
+  var pds=document.querySelectorAll(".prio-desc");
+  for(var k=0;k<pds.length;k++){ pds[k].addEventListener("input",function(){ getPrioDesc(state.ind)[parseInt(this.getAttribute("data-i"),10)]=this.value; touchProfile(); }); }
   var pd=el("payrollDeepNote"); if(pd){ pd.value=currentDetails().payrollDeep||""; pd.oninput=function(){ currentDetails().payrollDeep=pd.value; touchProfile(); syncDetails(); renderPresenterSummary(); }; }
   var rp=el("resetPrio");
   if(rp && !rp.dataset.bound){ rp.dataset.bound="1"; rp.addEventListener("click",function(){
+    if(!confirm("Khôi phục 3 vấn đề ưu tiên về gợi ý gốc của ngành? Mọi chỉnh sửa trên 3 ưu tiên (tiêu đề, mô tả) sẽ mất và lưu ngay.")) return;
     var titles=INDUSTRIES[state.ind].scenarios.map(function(x){return x.t;});
     var pr=getPrio(state.ind);
-    for(var i=0;i<3;i++) pr[i]=titles[i]||"";
+    var descs=getPrioDesc(state.ind);
+    for(var i=0;i<3;i++){ pr[i]=titles[i]||""; descs[i]=INDUSTRIES[state.ind].priorities[i].description||""; }
     touchProfile(); renderDiscovery(); renderPresenterSummary();
   }); }
   checkPrio();
@@ -1324,22 +1496,40 @@ function renderRoles(){
   }).join("");
 }
 
+function resizeScenarioField(field){
+  if(!field.getClientRects().length) return;
+  field.style.height="auto";
+  // scrollHeight includes padding; these fields use border-box with a 1px border.
+  field.style.height=(field.scrollHeight+2)+"px";
+}
+window.addEventListener("resize",function(){ document.querySelectorAll(".scen-f").forEach(resizeScenarioField); });
+function scenarioCloseQuestion(sc,i){
+  return String(storyFor(sc,i).close||"").replace(/^\s*(?:Câu hỏi chốt|Hỏi chốt)\s*:\s*/i,"");
+}
+function refreshScenarioQuestions(){
+  var scens=getScenarios(state.ind);
+  document.querySelectorAll("#scenarios .closeq").forEach(function(q,i){
+    q.innerHTML='<b>Hỏi chốt cuối bài:</b> “'+escHtml(scenarioCloseQuestion(scens[i],i))+'”';
+  });
+  var box=el("presenterCloseQuestions");
+  if(box) box.innerHTML=scens.map(function(sc,i){ return '<li><b>Bài '+(i+1)+':</b> '+escHtml(scenarioCloseQuestion(sc,i))+'</li>'; }).join("");
+}
 function renderScenarios(){
   var scens=getScenarios(state.ind);
-  var html='<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span style="font-size:13px;color:var(--muted)">✎ <b>Bấm vào tiêu đề hoặc bất kỳ ô Vấn đề / Xử lý / Kết quả / Giá trị nào để sửa.</b> Sửa ở đây đổi luôn ở kể chuyện, so sánh trước/sau, tổng hợp trình bày và file xuất — không cần sửa lại ở các chỗ đó. 3 bài toán dưới đây được gợi ý sẵn theo ngành <b style="color:var(--ink)">'+INDUSTRIES[state.ind].name+'</b>.</span><span style="flex:1"></span><button class="btn ghost small nopresent" id="resetScen">Khôi phục gợi ý gốc của ngành</button></div>';
+  var html='<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span style="font-size:13px;color:var(--muted)">✎ <b>Bấm vào tiêu đề hoặc bất kỳ ô Vấn đề / Xử lý / Kết quả / Giá trị nào để sửa.</b> Sửa ở đây đổi luôn ở kể chuyện, so sánh trước/sau, tổng hợp trình bày và file xuất — không cần sửa lại ở các chỗ đó. 3 bài toán dưới đây được gợi ý sẵn theo ngành <b style="color:var(--ink)">'+INDUSTRIES[state.ind].name+'</b>.</span><span style="flex:1"></span><button class="btn ghost small nopresent" id="resetScen" title="Bỏ mọi chỉnh sửa trên 3 bài toán này và quay về 3 bài gợi ý gốc của ngành — các sửa đổi đã lưu sẽ mất.">Khôi phục gợi ý gốc của ngành</button></div>';
   html+=scens.map(function(s,i){
     return '<article class="card scenario"><div class="scenario-head"><span class="no">'+(i+1)+'</span><input type="text" class="scen-title" data-i="'+i+'" value="'+s.t.replace(/"/g,'&quot;')+'" style="flex:1;min-width:200px;font-weight:700"><span class="chip">'+s.mins+'</span></div>'
     +'<div class="psov"><div class="p"><b>Vấn đề · Pain</b><textarea class="scen-f" data-i="'+i+'" data-k="pain" style="border:0;padding:0;min-height:74px;background:transparent">'+s.pain+'</textarea></div><div class="s"><b>Xử lý · Solution</b><textarea class="scen-f" data-i="'+i+'" data-k="sol" style="border:0;padding:0;min-height:74px;background:transparent">'+s.sol+'</textarea></div><div class="o"><b>Kết quả · Outcome</b><textarea class="scen-f" data-i="'+i+'" data-k="out" style="border:0;padding:0;min-height:74px;background:transparent">'+s.out+'</textarea></div><div class="v"><b>Giá trị · Value</b><textarea class="scen-f" data-i="'+i+'" data-k="val" style="border:0;padding:0;min-height:74px;background:transparent">'+s.val+'</textarea></div></div>'
     +'<div class="flowsteps">'+s.flow.map(function(f,j){return (j?'<i>→</i>':'')+'<span>'+f+'</span>'}).join("")+'</div>'
     +'<div class="split10"><span>2′ Nêu vấn đề</span><span>5′ Thao tác trên OneNow</span><span>2′ Kết quả &amp; giá trị</span><span>1′ Câu hỏi chốt</span></div>'
-    +'<div class="closeq"><b>Hỏi chốt cuối bài:</b> “Với cách xử lý vừa trình bày, anh/chị thấy đã phù hợp với quy trình hiện tại chưa — có điểm nào bắt buộc phải khác đi không?”</div></article>';
+    +'<div class="closeq"><b>Hỏi chốt cuối bài:</b> “'+escHtml(scenarioCloseQuestion(s,i))+'”</div></article>';
   }).join("");
   el("scenarios").innerHTML = html;
   var titles=document.querySelectorAll(".scen-title");
   for(var i=0;i<titles.length;i++){ titles[i].addEventListener("input",function(){ var idx=parseInt(this.getAttribute("data-i"),10); var oldT=getScenarios(state.ind)[idx].t; getScenarios(state.ind)[idx].t=this.value; getScenarios(state.ind)[idx]._edited=true; getScenarios(state.ind)[idx]._storyEdited=true; getScenarios(state.ind)[idx]._story=derivedStory(getScenarios(state.ind)[idx]); getScenarios(state.ind)[idx]._storyEdited=true; getScenarios(state.ind)[idx]._story=derivedStory(getScenarios(state.ind)[idx]); var pr=getPrio(state.ind); if(pr[idx]===oldT) pr[idx]=this.value; touchProfile(); renderPresenterSummary(); }); }
   var fs=document.querySelectorAll(".scen-f");
-  for(var j=0;j<fs.length;j++){ fs[j].addEventListener("input",function(){ var sc=getScenarios(state.ind)[parseInt(this.getAttribute("data-i"),10)]; sc[this.getAttribute("data-k")]=this.value; sc._edited=true; sc._storyEdited=true; sc._story=derivedStory(sc); touchProfile(); renderPresenterSummary(); }); }
-  el("resetScen").addEventListener("click",function(){ var p=activeProfile(); if(p&&p.industry===state.ind){ p.scenarios=deepClone(INDUSTRIES[state.ind].scenarios); p.scenarios.forEach(function(sc,i){ if(STORY[state.ind]&&STORY[state.ind][i]) sc._story=[STORY[state.ind][i].open, STORY[state.ind][i].screen, STORY[state.ind][i].action, STORY[state.ind][i].result, STORY[state.ind][i].close].join("|"); if(BEFORE_AFTER[state.ind]&&BEFORE_AFTER[state.ind][i]){ sc._before=BEFORE_AFTER[state.ind][i].before; sc._after=BEFORE_AFTER[state.ind][i].after; } delete sc._edited; sc._storyEdited=false; }); saveProfiles(); } else { delete state.scenCache[state.ind]; } renderScenarios(); renderStory(); renderCompare(); });
+  for(var j=0;j<fs.length;j++){ resizeScenarioField(fs[j]); fs[j].addEventListener("input",function(){ resizeScenarioField(this); var sc=getScenarios(state.ind)[parseInt(this.getAttribute("data-i"),10)]; sc[this.getAttribute("data-k")]=this.value; sc._edited=true; sc._storyEdited=true; sc._story=derivedStory(sc); touchProfile(); renderPresenterSummary(); }); }
+  el("resetScen").addEventListener("click",function(){ if(!confirm("Khôi phục 3 bài toán về gợi ý gốc của ngành? Mọi chỉnh sửa trên 3 bài này (tiêu đề, 4 ô, kể chuyện, Trước/Sau) sẽ mất và lưu ngay.")) return; var p=activeProfile(); if(p&&p.industry===state.ind){ p.scenarios=deepClone(INDUSTRIES[state.ind].scenarios); p.scenarios.forEach(function(sc,i){ if(STORY[state.ind]&&STORY[state.ind][i]) sc._story=[STORY[state.ind][i].open, STORY[state.ind][i].screen, STORY[state.ind][i].action, STORY[state.ind][i].result, STORY[state.ind][i].close].join("|"); if(BEFORE_AFTER[state.ind]&&BEFORE_AFTER[state.ind][i]){ sc._before=BEFORE_AFTER[state.ind][i].before; sc._after=BEFORE_AFTER[state.ind][i].after; } delete sc._edited; sc._storyEdited=false; }); saveProfiles(); } else { delete state.scenCache[state.ind]; } renderScenarios(); renderStory(); renderCompare(); renderPresenterSummary(); });
 }
 
 function renderAgenda(){
@@ -1386,11 +1576,13 @@ setInterval(function(){
 
 
 function escHtml(x){ return String(x==null?"":x).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;"); }
-function renderPresenterSummary(){
+function renderPresenterSummary(slidesOnly){
   var box=el("presenterSummary"); if(!box) return;
+  if(slidesOnly){ refreshDemoSlideSlots(box); return; }
+  refreshScenarioQuestions();
   var d=INDUSTRIES[state.ind]; var p=activeProfile();
-  var cName=(el("cName")&&el("cName").value.trim())||(p?p.name:"");
-  var cScale=(el("cScale")&&el("cScale").value.trim())||(p?(p.headcount+" nhân viên, "+p.locations+" địa điểm"):"");
+  var cName=(el("cName")&&el("cName").textContent.trim())||(p?p.name:"");
+  var cScale=(el("cScale")&&el("cScale").textContent.trim())||(p?(p.headcount+" nhân viên, "+p.locations+" địa điểm"):"");
   var cSys=(el("cSys")&&el("cSys").value.trim())||"";
   var notes=getDiscNotes(); var discFilled=0; for(var gi=0;gi<8;gi++){ if(notes[gi]&&String(notes[gi]).trim()) discFilled++; }
   var prio=getPrio(state.ind), sels=getPrioSel(state.ind);
@@ -1399,8 +1591,16 @@ function renderPresenterSummary(){
   var scens=getScenarios(state.ind);
   var scenHtml=scens.map(function(sc,i){
     var fields=[sc.pain,sc.sol,sc.out,sc.val]; var done=0; fields.forEach(function(f){ if(f&&String(f).trim()) done++; });
-    return '<li><b>Bài '+(i+1)+': '+escHtml(sc.t||"(chưa đặt tên bài)")+'</b> — đủ '+done+'/4 ô Pain–Solution–Outcome–Value'
-      +'<br><span style="color:var(--muted)">Vấn đề: '+(sc.pain?escHtml(sc.pain):"— chưa điền —")+' · Xử lý: '+(sc.sol?escHtml(sc.sol):"— chưa điền —")+' · Kết quả: '+(sc.out?escHtml(sc.out):"— chưa điền —")+' · Giá trị: '+(sc.val?escHtml(sc.val):"— chưa điền —")+'</span></li>';
+    var st=storyFor(sc,i), ba=(BEFORE_AFTER[state.ind]||[])[i]||{};
+    var before=sc._before!==undefined?sc._before:ba.before;
+    var after=sc._after!==undefined?sc._after:ba.after;
+    var steps=[["Câu mở đầu","open"],["Màn hình OneNow cần mở","screen"],["Thao tác chính","action"],["Kết quả cần chỉ cho khách thấy","result"],["Câu hỏi chốt","close"]];
+    return '<li class="presenter-scenario"><b>Bài '+(i+1)+': '+escHtml(sc.t||"(chưa đặt tên bài)")+'</b> — đủ '+done+'/4 ô Pain–Solution–Outcome–Value'
+      +'<br><span style="color:var(--muted)">Vấn đề: '+(sc.pain?escHtml(sc.pain):"— chưa điền —")+' · Xử lý: '+(sc.sol?escHtml(sc.sol):"— chưa điền —")+' · Kết quả: '+(sc.out?escHtml(sc.out):"— chưa điền —")+' · Giá trị: '+(sc.val?escHtml(sc.val):"— chưa điền —")+'</span>'
+      +'<div class="story-steps">'+steps.map(function(sp,j){ return '<div class="story-step"><span class="sn">'+(j+1)+'</span><div><b>'+sp[0]+'</b>'+escHtml(st[sp[1]]||"")+'</div></div>'; }).join("")+'</div>'
+      +'<div class="ba-grid"><div class="before"><b>Trước — cách làm hiện tại (giả định dựng demo, kiểm chứng ở Discovery)</b><p>'+escHtml(before||"")+'</p></div><div class="after"><b>Sau — với OneNow (quy trình thay đổi, không hứa con số thời gian)</b><p>'+escHtml(after||"")+'</p></div></div>'
+      +demoSlideSlot(i)
+      +'<div class="flowsteps">'+(sc.flow||[]).map(function(f,j){ return (j?'<i>→</i>':'')+'<span>'+escHtml(f)+'</span>'; }).join("")+'</div></li>';
   }).join("");
   var rows=getFitRows(state.ind);
   var counts={ready:0,config:0,dev:0,no:0}; rows.forEach(function(r){ if(counts[r.status]!==undefined) counts[r.status]++; });
@@ -1593,7 +1793,7 @@ function renderAdvance(){
   el("advBody").innerHTML = ADV_STEPS.map(function(s,i){
     var ex=(deep&&deep.advExamples&&deep.advExamples[i])?deep.advExamples[i]:null;
     var ap=det.actionPlan[i]||{owner:"",date:""};
-    return '<tr><td><b>'+s+'</b></td><td><input type="text" class="adv-owner" value="'+(ap.owner||"").replace(/"/g,"&quot;")+'" placeholder="'+(ex?ex.owner:"Tên người phụ trách")+'"></td><td><input type="date" class="adv-date" value="'+(ap.date||"")+'"></td><td style="color:var(--muted);font-size:13px" class="adv-purpose">'+(ex?ex.purpose:({ "Xác nhận phạm vi triển khai":"Chốt 3 bài toán và phạm vi dữ liệu / đơn vị áp dụng.","Workshop chuyên sâu theo bài toán":"Đi sâu bài toán còn vướng với C&B / HR của khách.","Chạy PoC với dữ liệu mẫu của khách":"Kiểm chứng trên dữ liệu thật trong phạm vi nhỏ, an toàn.","Gửi đề xuất thương mại":"Phạm vi, license, triển khai, bảo trì — theo báo giá chính thức.","Trình phương án với Ban Giám đốc":"Bản tóm tắt giá trị và lộ trình cho người quyết định."}[s]||""))+'</td></tr>';
+    return '<tr><td><b>'+s+'</b></td><td><input type="text" class="adv-owner" value="'+(ap.owner||"").replace(/"/g,"&quot;")+'" placeholder="'+(ex?ex.owner:"Tên người phụ trách")+'"></td><td><input type="date" class="adv-date" value="'+(ap.date||"")+'"></td><td style="color:var(--muted);font-size:13px" class="adv-purpose">'+(ex?ex.purpose:({ "Xác nhận phạm vi triển khai":"Chốt 3 bài toán và phạm vi dữ liệu / đơn vị áp dụng.","Workshop chuyên sâu theo bài toán":"Đi sâu bài toán còn vướng với C&B / HR của khách.","Chạy PoC với dữ liệu mẫu của khách":"Kiểm chứng trên dữ liệu thật trong phạm vi nhỏ, an toàn.","Gửi đề xuất thương mại":"Phạm vi, giấy phép, triển khai, bảo trì — theo báo giá chính thức.","Trình phương án với Ban Giám đốc":"Bản tóm tắt giá trị và lộ trình cho người quyết định."}[s]||""))+'</td></tr>';
   }).join("");
   renderAdvInd();
   var notes=document.querySelectorAll(".adv-note"); notes.forEach(function(n,i){ n.value=(det.closing&&det.closing[i])||""; });
@@ -1672,14 +1872,15 @@ function paintStoryTimers(){
     else { msg.textContent = tm.run ? "Đang chạy — canh nhịp 2′ vấn đề · 5′ thao tác · 2′ kết quả · 1′ chốt." : "Ngân sách 10 phút cho bài này (2′ vấn đề · 5′ thao tác · 2′ kết quả · 1′ chốt)."; }
   }
 }
-function renderCompare(){
+function renderCompare(slidesOnly){
   var box=el("compareWrap"); if(!box) return;
+  if(slidesOnly){ refreshDemoSlideSlots(box); return; }
   var ba=BEFORE_AFTER[state.ind]||[];
   var scens=getScenarios(state.ind);
   box.innerHTML = ba.map(function(x,i){
     var beforeTxt=scens[i]._before!==undefined?scens[i]._before:x.before;
     var afterTxt=scens[i]._after!==undefined?scens[i]._after:x.after;
-    return '<article class="card"><span class="disc-num">SO SÁNH TRƯỚC / SAU · BÀI '+(i+1)+'</span><h3 style="margin-top:4px">'+scens[i].t.replace(/</g,"&lt;")+'</h3><div class="ba-grid"><div class="before"><b>Trước — cách làm hiện tại (giả định dựng demo, kiểm chứng ở Discovery)</b><p>'+beforeTxt+'</p></div><div class="after"><b>Sau — với OneNow (quy trình thay đổi, không hứa con số thời gian)</b><p>'+afterTxt+'</p></div></div><div class="grid2" style="margin-top:10px"><div><label class="f">Sửa “Trước” của bài này (lưu theo bài, tải lại vẫn còn)</label><textarea class="ba-before" data-i="'+i+'">'+beforeTxt+'</textarea></div><div><label class="f">Sửa “Sau” của bài này (lưu theo bài, tải lại vẫn còn)</label><textarea class="ba-after" data-i="'+i+'">'+afterTxt+'</textarea></div></article>';
+    return '<article class="card"><span class="disc-num">SO SÁNH TRƯỚC / SAU · BÀI '+(i+1)+'</span><h3 style="margin-top:4px">'+scens[i].t.replace(/</g,"&lt;")+'</h3><div class="ba-grid"><div class="before"><b>Trước — cách làm hiện tại (giả định dựng demo, kiểm chứng ở Discovery)</b><p>'+beforeTxt+'</p></div><div class="after"><b>Sau — với OneNow (quy trình thay đổi, không hứa con số thời gian)</b><p>'+afterTxt+'</p></div></div>'+demoSlideSlot(i)+'<div class="grid2" style="margin-top:10px"><div><label class="f">Sửa “Trước” của bài này (lưu theo bài, tải lại vẫn còn)</label><textarea class="ba-before" data-i="'+i+'">'+beforeTxt+'</textarea></div><div><label class="f">Sửa “Sau” của bài này (lưu theo bài, tải lại vẫn còn)</label><textarea class="ba-after" data-i="'+i+'">'+afterTxt+'</textarea></div></article>';
   }).join("");
   document.querySelectorAll(".ba-before").forEach(function(t){ t.addEventListener("input",function(){ var sc=getScenarios(state.ind)[parseInt(this.getAttribute("data-i"),10)]; sc._before=this.value; touchProfile(); renderPresenterSummary(); }); });
   document.querySelectorAll(".ba-after").forEach(function(t){ t.addEventListener("input",function(){ var sc=getScenarios(state.ind)[parseInt(this.getAttribute("data-i"),10)]; sc._after=this.value; touchProfile(); renderPresenterSummary(); }); });
@@ -1722,14 +1923,178 @@ function restoreEstimator(){
   else { el("estHead").value=c.head||""; el("estDays").value=c.days||""; el("estPeople").value=c.people||""; }
   renderEstimator();
 }
+var _aiRequestBusy=false;
+// One watcher for the open profile; no timer or GET while both request flags are off.
+var _profileWatch=null, _profileFlow={};
+function profileEditing(){
+  var a=document.activeElement;
+  return a && (a.matches("input,textarea,select") || a.isContentEditable || a.closest('[contenteditable]:not([contenteditable="false"])'));
+}
+function profileEditData(p){
+  var data={profile:{}};
+  ["name","locations","headcount","prio","prioSel","scenarios","fitRows"].forEach(function(k){ data.profile[k]=p[k]; });
+  ["discNotes","_detailsByProfile","_healthByProfile","_prepByProfile","_checkedByProfile","_scoreCache","estCache"].forEach(function(k){
+    var key=k==="discNotes" || k==="estCache" || k==="_scoreCache" ? "p:"+p.id : p.id;
+    data[k]=(state[k]||{})[key];
+  });
+  data.scores=state.scores; data.checked=state.checked;
+  return JSON.parse(JSON.stringify(data));
+}
+// Three-way merge: only local changes since waiting began win over incoming data.
+function preserveProfileEdits(base, local, incoming){
+  if(JSON.stringify(base)===JSON.stringify(local)) return incoming;
+  if(!base || !local || typeof base!=="object" || typeof local!=="object") return local;
+  var out=Array.isArray(local) ? (Array.isArray(incoming)?incoming.slice():[]) : Object.assign({},incoming);
+  Object.keys(local).forEach(function(k){ out[k]=preserveProfileEdits(base[k],local[k],out[k]); });
+  Object.keys(base).forEach(function(k){ if(!(k in local)) delete out[k]; });
+  return out;
+}
+function installProfileEdits(p, data){
+  Object.assign(p,data.profile);
+  Object.keys(data).forEach(function(k){
+    if(k==="profile") return;
+    if(k==="scores" || k==="checked"){ state[k]=data[k]; return; }
+    var key=k==="discNotes" || k==="estCache" || k==="_scoreCache" ? "p:"+p.id : p.id;
+    state[k][key]=data[k];
+  });
+}
+function syncProfileWatch(){
+  var p=activeProfile();
+  if(_profileWatch && (!p || p.id!==_profileWatch.id)){
+    clearTimeout(_profileWatch.timer); clearTimeout(_profileWatch.waitTimer); _profileWatch=null;
+  }
+  if(!p || !p._serverId || (!p.aiSuggestionRequested && !p.companyResearchRequested)) return;
+  if(!_profileWatch) _profileWatch={id:p.id, base:profileEditData(p), drafts:new Map(), done:{}, since:0};
+  var w=_profileWatch;
+  if(!w.timer && !w.polling) w.timer=setTimeout(function(){ pollProfileWatch(w); },5000);
+}
+async function pollProfileWatch(w){
+  w.timer=null;
+  if(_profileWatch!==w) return;
+  var p=activeProfile();
+  if(!p || p.id!==w.id) return;
+  w.polling=true;
+  try{
+    var full=await apiFetch("/api/profiles/"+p._serverId);
+    if(_profileWatch!==w || activeProfile()!==p) return;
+    if(p.aiSuggestionRequested && !full.aiSuggestionRequested) w.done.ai=true;
+    if(p.companyResearchRequested && !full.companyResearchRequested) w.done.research=true;
+    p.aiSuggestionRequested=!!full.aiSuggestionRequested;
+    p.companyResearchRequested=!!full.companyResearchRequested;
+    if(w.done.ai || w.done.research){
+      if(!w.since) w.since=Date.now();
+      queueProfileRefresh(w);
+    }
+  }catch(e){
+    if(_profileWatch===w) el("profStatus").textContent="Chưa kiểm tra được kết quả, sẽ thử lại khi còn yêu cầu đang chờ.";
+  }finally{
+    w.polling=false;
+    if(_profileWatch===w) syncProfileWatch();
+  }
+}
+function queueProfileRefresh(w){
+  if(w.refreshing || w.waitTimer || _profileWatch!==w) return;
+  if(profileEditing() && Date.now()-w.since<30000){
+    el("flowStatus").textContent="Đã có kết quả mới; sẽ cập nhật khi anh rời ô đang sửa (tối đa 30 giây).";
+    w.waitTimer=setTimeout(function(){ w.waitTimer=null; queueProfileRefresh(w); },1000);
+    return;
+  }
+  refreshCompletedProfile(w);
+}
+async function refreshCompletedProfile(w){
+  w.refreshing=true;
+  var timedOut=!!profileEditing(), focus=document.activeElement;
+  var start=focus && focus.selectionStart, end=focus && focus.selectionEnd;
+  try{
+    var p=await openServerProfile(w.id,function(){
+      if(_profileWatch!==w || !activeProfile() || activeProfile().id!==w.id) return false;
+      if(profileEditing() && Date.now()-w.since<30000){
+        w.refreshing=false; queueProfileRefresh(w); return false;
+      }
+      timedOut=!!profileEditing(); focus=document.activeElement;
+      start=focus && focus.selectionStart; end=focus && focus.selectionEnd;
+      return true;
+    });
+    if(!p) return;
+    if(!p.aiSuggestionRequested && w.localFlagsAi) w.done.ai=true;
+    if(!p.companyResearchRequested && w.localFlagsResearch) w.done.research=true;
+    // Capture edits at response time as the user may keep typing during the GET.
+    if(timedOut && focus){ var focusedDraft=profileDraft(focus); w.drafts.set(focusedDraft.selector+":"+focusedDraft.index,focusedDraft); }
+    var merged=preserveProfileEdits(w.base,w.local || {},profileEditData(p));
+    installProfileEdits(p,merged);
+    clearTimeout(w.timer); clearTimeout(w.waitTimer); _profileWatch=null;
+    var kinds=w.done.ai && w.done.research ? "gợi ý và thông tin khách" : w.done.research ? "thông tin khách" : "gợi ý";
+    _profileFlow[p.id]=w.done.research && !w.done.ai ? "Đã có thông tin khách mới ở ghi chú và các mục dưới — anh xem lại và sửa nếu cần." : "Đã có gợi ý mới ở mục 2, 4, 7 — anh xem lại và sửa nếu cần.";
+    applyContext(); renderAdvance();
+    w.drafts.forEach(function(d){
+      var target=findProfileDraft(d);
+      if(target){ if(target.isContentEditable) target.textContent=d.value; else target.value=d.value; }
+    });
+    if(timedOut && focus){
+      var restored=findProfileDraft(profileDraft(focus));
+      if(restored){ restored.focus(); if(start!==null && restored.setSelectionRange) try{ restored.setSelectionRange(start,end); }catch(_){} }
+    }
+    el("profStatus").textContent="Đã nhận "+kinds+" mới — các mục dưới đã cập nhật."+(timedOut ? " Đã chờ 30 giây; nội dung anh đang sửa được giữ nguyên." : "");
+  }catch(e){
+    if(_profileWatch===w){
+      el("profStatus").textContent="Chưa tải được kết quả mới. Anh mở lại hồ sơ để thử lại; nội dung đang sửa vẫn được giữ nguyên.";
+      clearTimeout(w.timer); clearTimeout(w.waitTimer); _profileWatch=null;
+    }
+  }
+}
+function profileDraft(node){
+  var selector=node.id ? "#"+CSS.escape(node.id) : node.tagName.toLowerCase()+Array.from(node.classList).map(function(c){return "."+CSS.escape(c);}).join("");
+  return {selector:selector, index:Array.from(document.querySelectorAll(selector)).indexOf(node), value:node.isContentEditable?node.textContent:node.value};
+}
+function findProfileDraft(d){ return document.querySelectorAll(d.selector)[d.index]; }
+["input","change"].forEach(function(type){ document.addEventListener(type,function(e){
+  var w=_profileWatch, p=activeProfile(), node=e.target;
+  if(!w || !p || p.id!==w.id || node.id==="profSelect" || !(node.matches("input,textarea,select") || node.isContentEditable)) return;
+  var d=profileDraft(node); w.drafts.set(d.selector+":"+d.index,d);
+}); });
+function renderProfileBasics(){
+  var p=activeProfile();
+  el("cName").textContent=p ? p.name : "— chưa nhập —";
+  el("cScale").textContent=p ? p.headcount+" nhân viên, "+p.locations+" địa điểm" : "— chưa nhập —";
+}
 function renderProfiles(){
+  renderProfileBasics();
   var sel=el("profSelect"); if(!sel) return;
   var p=activeProfile();
-  var opts='<option value="">— Mẫu ngành gốc (chưa lưu hồ sơ) —</option>';
-  state.profiles.forEach(function(pr){ opts+='<option value="'+pr.id+'"'+(p&&p.id===pr.id?' selected':'')+'>'+pr.name.replace(/</g,"&lt;")+' · '+INDUSTRIES[pr.industry].name+' · '+pr.locations+' địa điểm · '+pr.headcount+' NV</option>'; });
+  var aiButton=el("profRequestAi");
+  aiButton.style.display=p && p.isDefault===true ? "none" : "";
+  aiButton.disabled=_aiRequestBusy || !!(p && (p.companyResearchRequested || p.aiSuggestionRequested || p._aiRequestBusy));
+  aiButton.classList.toggle("processing", aiButton.disabled);
+  aiButton.textContent=p && p.companyResearchRequested ? "Đang tìm thông tin khách..." :
+    p && p.aiSuggestionRequested ? "Đang chờ gợi ý AI..." : "Tìm thông tin & gợi ý AI";
+  var researchNote=el("researchNote");
+  var note=p ? p.companyResearchNote || "" : "";
+  researchNote.textContent=note.trim() ? "Thông tin tìm trên mạng — chưa kiểm chứng, anh xem lại trước khi dùng: " + note : "";
+  researchNote.style.display=note.trim() ? "" : "none";
+  var industryName=INDUSTRIES[state.ind].name;
+  var opts='<option value="">— Mẫu ngành '+(p ? 'gốc' : industryName)+' (chưa lưu hồ sơ) —</option>';
+  state.profiles.forEach(function(pr){ opts+='<option value="'+pr.id+'"'+(p&&p.id===pr.id?' selected':'')+'>'+((pr.name||"").trim() ? pr.name : "(chưa đặt tên)").replace(/</g,"&lt;")+' · '+INDUSTRIES[pr.industry].name+' · '+pr.locations+' địa điểm · '+pr.headcount+' NV</option>'; });
   sel.innerHTML=opts;
+  sel.value=p ? String(p.id) : "";
   el("profStatus").innerHTML = p ? ("Đang mở hồ sơ: <b>"+p.name.replace(/</g,"&lt;")+"</b> · Ngành "+INDUSTRIES[p.industry].name+" · "+p.locations+" địa điểm · "+p.headcount+" nhân viên. Mọi sửa đổi ở Discovery, kịch bản và Fit–Gap chỉ áp cho hồ sơ này (lưu trên server PresalesDemo).") : "Đang xem: <b>Mẫu ngành gốc</b> — khi bấm “Tạo hồ sơ”, ưu tiên và bài toán đang hiển thị ở mẫu sẽ được mang theo vào hồ sơ mới; Discovery và Fit–Gap chỉ mang theo phần đã sửa, phần chưa sửa giữ nguyên dữ liệu mẫu của hồ sơ.";
-  if(p){ el("profName").value=p.name; el("profLoc").value=p.locations; el("profHead").value=p.headcount; }
+  if(p){
+    el("profName").value=p.name;
+    el("profLoc").value=p.locations;
+    el("profHead").value=p.headcount;
+  } else {
+    var sample=state.profiles.find(function(pr){ return pr.isDefault && pr.industry===state.ind; });
+    if(sample){
+      el("profLoc").value=sample.locations;
+      el("profHead").value=sample.headcount;
+    }
+  }
+  el("flowStatus").textContent=!p ? (_aiRequestBusy ? "Đang tạo hồ sơ để tìm thông tin và gợi ý AI..." : "Nhập tên khách ở trên rồi bấm “Tìm thông tin & gợi ý AI” để tạo hồ sơ "+industryName+" và bắt đầu.") :
+    p.isDefault===true ? "Đây là hồ sơ mẫu — tạo hồ sơ khách thật để dùng nút gợi ý." :
+    p.companyResearchRequested ? "Đang tìm thông tin khách; sau đó sẽ gợi ý AI. Anh cứ để trang mở, kết quả sẽ tự cập nhật." :
+    p.aiSuggestionRequested ? "Đang chờ gợi ý AI; anh cứ để trang mở, kết quả sẽ tự cập nhật." :
+    (_aiRequestBusy || p._aiRequestBusy) ? "Đang gửi yêu cầu tìm thông tin khách..." :
+    _profileFlow[p.id] || "Đã mở hồ sơ — bấm “Tìm thông tin & gợi ý AI” để bắt đầu hoặc sửa các mục dưới.";
+  syncProfileWatch();
 }
 function applyContext(){
   state.autoScoreExp=[];
@@ -1747,8 +2112,8 @@ function applyContext(){
   restoreEstimator();
   var p=activeProfile();
   if(p){
-    el("cName").value=p.name;
-    el("cScale").value=p.headcount+" nhân viên, "+p.locations+" địa điểm";
+    el("cName").textContent=p.name;
+    el("cScale").textContent=p.headcount+" nhân viên, "+p.locations+" địa điểm";
     var det=currentDetails();
     if(el("cSys")) el("cSys").value=det.systemInfo||"";
     if(el("payrollDeepNote")) el("payrollDeepNote").value=det.payrollDeep||"";
@@ -1766,6 +2131,7 @@ el("presentToggle").addEventListener("click",function(){
   var on=document.body.classList.toggle("presenting");
   this.textContent = on ? "Thoát chế độ trình chiếu" : "Vào chế độ trình chiếu";
   if(on){ renderPresenterSummary(); document.getElementById("trinhbay").scrollIntoView({behavior:"smooth"}); }
+  else { document.querySelectorAll(".scen-f").forEach(resizeScenarioField); }
 });
 el("addFit").addEventListener("click",function(){
   var rows=getFitRows(state.ind);
@@ -1790,7 +2156,7 @@ el("resetFit").addEventListener("click",async function(){
   renderFit();
 });
 ["estHead","estDays","estPeople"].forEach(function(id){ el(id).addEventListener("input",function(){ renderEstimator(); var d=currentDetails(); d.estimator={head:el("estHead").value, days:el("estDays").value, people:el("estPeople").value}; touchProfile(); syncDetails(); }); });
-el("profCreate").addEventListener("click",async function(){
+async function createProfileFromInputs(){
   var name=el("profName").value.trim();
   if(!name){ el("profName").focus(); el("profStatus").innerHTML="<b style='color:var(--red)'>Nhập tên khách hàng trước khi tạo hồ sơ.</b>"; return; }
   var dup=state.profiles.some(function(pr){ return pr.name.trim().toLowerCase()===name.toLowerCase(); });
@@ -1802,7 +2168,7 @@ el("profCreate").addEventListener("click",async function(){
   var head=parseInt(headRaw,10); if(isNaN(head)) head=0;
   // Snapshot template-mode edits BEFORE creating: getPrio/getScenarios/getFitRows/getDiscNotes
   // return template caches while no profile is active.
-  var tplPrio=deepClone(getPrio(ind)), tplPrioSel=deepClone(getPrioSel(ind));
+  var tplPrio=deepClone(getPrio(ind)), tplPrioDesc=deepClone(getPrioDesc(ind)), tplPrioSel=deepClone(getPrioSel(ind));
   var tplScens=deepClone(getScenarios(ind));
   var tplDisc=deepClone(getDiscNotes());
   var tplFit=deepClone(getFitRows(ind));
@@ -1815,7 +2181,7 @@ el("profCreate").addEventListener("click",async function(){
     var pr=convertServerProfile(full);
     state.profiles.push(pr); state.activeProfileId=pr._serverId; state.ind=ind;
     // Carry template content into the new profile (what the user saw in template mode).
-    pr.prio=tplPrio; pr.prioSel=tplPrioSel;
+    pr.prio=tplPrio; pr.prioDesc=tplPrioDesc; pr.prioSel=tplPrioSel;
     pr.scenarios=tplScens;
     // Discovery: only carry non-empty template notes; keep seed sample answers elsewhere.
     var nd=state.discNotes["p:"+pr._serverId]||{};
@@ -1838,8 +2204,17 @@ el("profCreate").addEventListener("click",async function(){
     // and POSTs fit rows that have no _serverId).
     syncProfile(pr);
     el("profStatus").innerHTML="Đã tạo hồ sơ <b>"+pr.name.replace(/</g,"&lt;")+"</b> và mang theo ưu tiên + bài toán từ mẫu ngành gốc" + (fitEdited?" (kèm Fit–Gap đã sửa)":"") + ". Discovery chỉ mang theo phần đã ghi, phần còn lại giữ dữ liệu mẫu của hồ sơ.";
+    return pr;
   }catch(e){ apiErr(e); }
-});
+}
+var _profileCreation=null;
+function createProfileOnce(){
+  if(!_profileCreation){
+    _profileCreation=createProfileFromInputs().finally(function(){ _profileCreation=null; });
+  }
+  return _profileCreation;
+}
+el("profCreate").addEventListener("click",function(){ createProfileOnce(); });
 el("profClone").addEventListener("click",async function(){
   var p=activeProfile(); if(!p){ el("profStatus").innerHTML="<b style='color:var(--red)'>Chưa có hồ sơ nào đang mở để nhân bản — hãy tạo hoặc chọn một hồ sơ trước.</b>"; return; }
   if(!p._serverId){ el("profStatus").innerHTML="<b style='color:var(--red)'>Hồ sơ này chưa có trên server, hãy chọn lại hồ sơ từ danh sách.</b>"; return; }
@@ -1851,28 +2226,86 @@ el("profClone").addEventListener("click",async function(){
     applyContext();
   }catch(e){ apiErr(e); }
 });
+function removeProfileOption(id){
+  state.profiles=state.profiles.filter(function(x){return x._serverId!==id && x.id!==id;});
+  delete state.discNotes["p:"+id]; delete state.estCache["p:"+id];
+  if(state.activeProfileId===id) state.activeProfileId=null;
+}
 el("profDelete").addEventListener("click",async function(){
-  var p=activeProfile(); if(!p){ el("profStatus").innerHTML="<b style='color:var(--red)'>Chưa có hồ sơ nào đang mở để xoá.</b>"; return; }
-  try{ await apiFetch("/api/profiles/"+p._serverId,"DELETE"); }catch(e){ apiErr(e); return; }
-  state.profiles=state.profiles.filter(function(x){return x._serverId!==p._serverId && x.id!==p.id;});
-  delete state.discNotes["p:"+p._serverId]; delete state.estCache["p:"+p._serverId];
-  state.activeProfileId=null; applyContext();
+  var selected=el("profSelect").value;
+  var p=activeProfile();
+  var sid=selected ? parseInt(selected,10) : (p && p._serverId);
+  if(!sid){ el("profStatus").innerHTML="<b style='color:var(--red)'>Chưa có hồ sơ nào đang mở để xoá.</b>"; return; }
+  var target=state.profiles.find(function(pr){ return pr._serverId===sid || pr.id===sid; });
+  var profileName=(target && target.name) || (p && p.name) || "hồ sơ đang chọn";
+  if(!confirm('Xoá hồ sơ "'+profileName+'" cùng toàn bộ dữ liệu của nó (Discovery, ưu tiên, kịch bản, Fit-Gap, chấm điểm, bước tiếp)? Không lấy lại được.')) return;
+  var alreadyDeleted=false;
+  try{ await apiFetch("/api/profiles/"+sid,"DELETE"); }catch(e){
+    if(!/^404\b/.test(String(e.message || e))){ apiErr(e); return; }
+    alreadyDeleted=true;
+  }
+  removeProfileOption(sid);
+  applyContext();
+  if(alreadyDeleted) el("profStatus").textContent="Hồ sơ này đã bị xóa trước đó.";
 });
-el("profMaster").addEventListener("click",function(){ state.activeProfileId=null; saveProfiles(); applyContext(); });
+el("profRequestAi").addEventListener("click",async function(){
+  var p=activeProfile();
+  if(p && p.isDefault===true) return;
+  if(_aiRequestBusy || (p && (p.companyResearchRequested || p.aiSuggestionRequested || p._aiRequestBusy))) return;
+  _aiRequestBusy=true;
+  renderProfiles();
+  if(!p) p=await createProfileOnce();
+  if(!p || !p._serverId){
+    var creationError=el("profStatus").innerHTML;
+    _aiRequestBusy=false;
+    renderProfiles();
+    el("profStatus").innerHTML=creationError;
+    return;
+  }
+  p._aiRequestBusy=true;
+  renderProfiles();
+  try{
+    var result=await apiFetch("/api/profiles/"+p._serverId+"/request-company-research","POST",{});
+    p.companyResearchRequested=!!result.companyResearchRequested;
+    p.companyResearchRequestedAt=result.companyResearchRequestedAt;
+  }catch(e){
+    _aiRequestBusy=false;
+    p._aiRequestBusy=false;
+    renderProfiles();
+    el("profStatus").textContent="Gửi yêu cầu tìm thông tin thất bại: "+String(e.message || e)+". Vui lòng bấm nút để thử lại.";
+    return;
+  }
+  _aiRequestBusy=false;
+  p._aiRequestBusy=false;
+  renderProfiles();
+});
+el("profMaster").addEventListener("click",function(){ if(activeProfile()) el("profName").value=""; state.activeProfileId=null; saveProfiles(); applyContext(); });
 el("profSelect").addEventListener("change",async function(){
   var id=this.value;
-  if(!id){ state.activeProfileId=null; applyContext(); return; }
+  if(!id){ if(activeProfile()) el("profName").value=""; state.activeProfileId=null; applyContext(); return; }
   var sid=parseInt(id,10);
   var existing=null; for(var i=0;i<state.profiles.length;i++){ if(state.profiles[i]._serverId===sid || state.profiles[i].id===sid) existing=state.profiles[i]; }
-  if(existing && existing._fullLoaded){ state.activeProfileId=sid; state.ind=existing.industry; applyContext(); return; }
-  try{ await openServerProfile(sid); applyContext(); }catch(e){ apiErr(e); }
+  if(existing && existing._fullLoaded){ state.activeProfileId=sid; state.ind=existing.industry; loadDemoSlides(sid); applyContext(); return; }
+  try{ await openServerProfile(sid); applyContext(); }catch(e){
+    removeProfileOption(sid);
+    applyContext();
+    await loadServerProfiles();
+    removeProfileOption(sid);
+    if(!activeProfile()) state.activeProfileId=null;
+    applyContext();
+    el("profStatus").textContent=/^404\b/.test(String(e.message || e)) ?
+      "Hồ sơ này không còn trên server — đã tải lại danh sách." :
+      "Không mở được hồ sơ — đã thử tải lại danh sách và quay về hồ sơ đang mở hoặc mẫu ngành gốc.";
+  }
 });
 ["profName","profLoc","profHead"].forEach(function(id){ el(id).addEventListener("input",function(){
   var p=activeProfile(); if(!p) return;
   if(id!=="profName" && el(id).value.trim() && !/^\d+$/.test(el(id).value.trim())){ el("profStatus").innerHTML="<b style='color:var(--red)'>Số địa điểm / số nhân viên phải là số nguyên — giá trị vừa nhập chưa được lưu.</b>"; return; }
+  if(!el("profName").value.trim()){ el("profName").value=p.name; el("profStatus").innerHTML="<b style='color:var(--red)'>Tên khách hàng không được để trống — đã giữ lại tên cũ.</b>"; return; }
   p.name=el("profName").value; p.locations=el("profLoc").value; p.headcount=el("profHead").value; saveProfiles();
-  if(el("cName")) el("cName").value=p.name;
-  if(el("cScale")) el("cScale").value=p.headcount+" nhân viên, "+p.locations+" địa điểm";
+  if(el("cName")) el("cName").textContent=p.name;
+  if(el("cScale")) el("cScale").textContent=p.headcount+" nhân viên, "+p.locations+" địa điểm";
+  renderPresenterSummary();
   var sel=el("profSelect"); if(sel&&sel.selectedIndex>0){ sel.options[sel.selectedIndex].text=p.name+" · "+INDUSTRIES[p.industry].name+" · "+p.locations+" địa điểm · "+p.headcount+" NV"; }
 });});
 function downloadText(fname, lines){
@@ -1885,7 +2318,7 @@ function ctxHeader(title){
   L.push(title);
   L.push("Ngành: "+d.name+" ("+d.sub+")");
   if(p) L.push("Hồ sơ khách: "+p.name+" · "+p.locations+" địa điểm · "+p.headcount+" nhân viên (hồ sơ lưu trên server PresalesDemo)");
-  L.push("Khách hàng: "+(el("cName").value||"—")+" · Quy mô: "+(el("cScale").value||"—")+" · Hiện tại: "+(el("cSys").value||"—"));
+  L.push("Khách hàng: "+(el("cName").textContent||"—")+" · Quy mô: "+(el("cScale").textContent||"—")+" · Hiện tại: "+(el("cSys").value||"—"));
   return L;
 }
 el("downloadBtn").addEventListener("click",function(){
@@ -2010,34 +2443,63 @@ document.querySelectorAll("[data-theme-btn]").forEach(function(b){ b.addEventLis
 try{ applyTheme(localStorage.getItem("onenowPresalesTheme")||"system"); }catch(_){ applyTheme("system"); }
 renderAll(); renderRoles(); renderAgenda(); renderChecks(); renderScores(); renderAdvance(); setSegUI(); paintTimer(); restoreEstimator(); renderProfiles();
 el("autoScoreBtn").addEventListener("click",function(){ autoScore(); });
-["cName","cScale","cSys"].forEach(function(id){ var inp=el(id); if(inp) inp.addEventListener("input",function(){
-  var p=activeProfile();
-  if(id==="cName" && p){ p.name=inp.value; el("profName").value=inp.value; saveProfiles(); }
-  if(id==="cSys"){ currentDetails().systemInfo=inp.value; touchProfile(); syncDetails(); }
-  if(id==="cScale" && p){ var nums=(inp.value.match(/\d+/g)||[]); if(nums.length>=1){ p.headcount=nums[0]; el("profHead").value=nums[0]; } if(nums.length>=2){ p.locations=nums[1]; el("profLoc").value=nums[1]; } saveProfiles(); }
+el("cSys").addEventListener("input",function(){
+  currentDetails().systemInfo=this.value; touchProfile(); syncDetails();
   renderPresenterSummary();
-}); });
+});
 document.querySelectorAll(".adv-note").forEach(function(n){ n.addEventListener("input",function(){ renderPresenterSummary(); }); });
 document.addEventListener("input",function(e){ if(e.target&&(e.target.classList.contains("disc-note")||e.target.classList.contains("prio-text"))) renderPresenterSummary(); });
 document.addEventListener("change",function(e){ if(e.target&&e.target.classList.contains("prio-sel")) renderPresenterSummary(); });
 renderPresenterSummary();
-var _p0=activeProfile(); if(_p0){ el("cName").value=_p0.name; el("cScale").value=_p0.headcount+" nhân viên, "+_p0.locations+" địa điểm"; }
+var _p0=activeProfile(); if(_p0){ el("cName").textContent=_p0.name; el("cScale").textContent=_p0.headcount+" nhân viên, "+_p0.locations+" địa điểm"; }
 loadServerProfiles();
 
 /* Nav active: dùng vị trí tài liệu thực (rect.top + scrollY) thay vì offsetTop,
    vì offsetTop đo theo offsetParent và không cập nhật đúng sau khi renderAll
    đổi chiều cao các mục. Ngưỡng = chiều cao header sticky thực tế + 16px.
    Chạy lại sau render, sau khi tải hồ sơ từ server, khi resize và khi cuộn. */
+var _navTarget=null, _navLockUntil=0;
 window.updateFlow = function(){
   var map=["nganh","discovery","nghe","kichban","checklist","health","fitgap","phandoi","score","advance","trinhbay"];
-  var topbar=document.querySelector(".topbar");
-  var headH=topbar ? topbar.getBoundingClientRect().height : 160;
-  var y=window.scrollY+headH+16, cur="nganh";
-  map.forEach(function(id){ var el2=document.getElementById(id); if(el2 && (el2.getBoundingClientRect().top+window.scrollY)<=y) cur=id; });
+  if(_navTarget){
+    var te=document.getElementById(_navTarget);
+    var reached = te && Math.abs(window.scrollY-(te.getBoundingClientRect().top+window.scrollY-132))<=8; // must be <=8: updateFlow threshold is +140, so only within 8px of target does y reach the section top
+    if(!reached && Date.now()<_navLockUntil){
+      document.querySelectorAll(".nav a").forEach(function(a){ a.classList.toggle("active", a.getAttribute("href")==="#"+_navTarget); });
+      return;
+    }
+    _navTarget=null;
+  }
+  // Threshold = scroll-margin-top (132px) + 8px tolerance for sub-pixel section tops (line-height 1.55*15.5px etc. makes tops fractional, so exact equality fails by <1px on some sections).
+  var y=window.scrollY+140, cur="nganh";
+  map.forEach(function(id){ var el2=document.getElementById(id); if(!el2) return; var r=el2.getBoundingClientRect(); if(r.height===0 || el2.offsetParent===null) return; if((r.top+window.scrollY)<=y) cur=id; });
+  // Last section: page may not scroll far enough for its top to reach the threshold (foot is short), so near-bottom counts as last visible section.
+  if(window.innerHeight+window.scrollY>=document.documentElement.scrollHeight-10){
+    for(var i=map.length-1;i>=0;i--){ var el3=document.getElementById(map[i]); if(el3 && el3.getBoundingClientRect().height>0 && el3.offsetParent!==null){ cur=map[i]; break; } }
+  }
   document.querySelectorAll(".nav a").forEach(function(a){ a.classList.toggle("active", a.getAttribute("href")==="#"+cur); });
 };
 window.addEventListener("scroll", window.updateFlow, {passive:true});
 window.addEventListener("resize", window.updateFlow);
+document.querySelectorAll(".nav a").forEach(function(a){
+  a.addEventListener("click",function(e){
+    var t=document.querySelector(a.getAttribute("href"));
+    if(!t) return;
+    e.preventDefault();
+    if(document.body.classList.contains("presenting") && (t.getBoundingClientRect().height===0 || t.offsetParent===null)){
+      document.body.classList.remove("presenting");
+      var pt=document.getElementById("presentToggle"); if(pt) pt.textContent="Vào chế độ trình chiếu";
+    }
+    // Deterministic: set active immediately, scroll to exact section top minus scroll-margin, do not rely on browser anchor + smooth-scroll timing.
+    document.querySelectorAll(".nav a").forEach(function(x){ x.classList.toggle("active", x===a); });
+    _navTarget=a.getAttribute("href").slice(1);
+    _navLockUntil=Date.now()+4000;
+    setTimeout(function(){
+      var top=t.getBoundingClientRect().top+window.scrollY-132;
+      window.scrollTo({top:top,behavior:"smooth"});
+    }, t.getBoundingClientRect().height===0 ? 50 : 0);
+  });
+});
 window.updateFlow();
 </script>
 </body>
