@@ -94,7 +94,11 @@ public static class CrmApi
             var error = AppointmentError(input); if (error != null) return Results.BadRequest(error);
             var x = await db.DemoAppointments.FindAsync(id); if (x == null) return Results.NotFound();
             x.Title = input.Title.Trim(); x.StartsAt = input.StartsAt; x.EndsAt = input.EndsAt; x.Location = input.Location; x.Notes = input.Notes; x.ReminderMinutes = input.ReminderMinutes; x.Status = input.Status;
-            var p = await db.Profiles.FindAsync(x.ProfileId); if (p != null) { p.DemoDate = x.StartsAt; Touch(p); }
+            var p = await db.Profiles.FindAsync(x.ProfileId); if (p != null) {
+                if (x.Status != "DaHuy") p.DemoDate = x.StartsAt;
+                else if (p.DemoDate == x.StartsAt) p.DemoDate = null;
+                Touch(p);
+            }
             await db.SaveChangesAsync(); return Results.Ok(x);
         });
         app.MapDelete("/api/appointments/{id:int}", async (int id, PresalesDbContext db) => {
@@ -152,8 +156,12 @@ public static class CrmApi
             var lost = events.Where(i => i.Type == "GhiChu" && i.Note == "Đổi trạng thái → Mất").Select(i => i.ProfileId).Distinct().Count();
             return new {
                 surveys = surveys.Count(s => allowed.Contains(s.ProfileId!.Value) && s.SubmittedAt >= from && s.SubmittedAt < until),
-                // Booking interactions are linked, counted once through the completed appointment instead.
-                demos = events.Count(i => i.Type == "Demo" && !i.Note.Contains(" [appointment:")) + appointments.Count(a => allowed.Contains(a.ProfileId) && a.StartsAt >= from && a.StartsAt < until),
+                // Count each profile/date once across completed appointments and manual demos.
+                demos = events.Where(i => i.Type == "Demo" && !i.Note.Contains("[appointment:"))
+                    .Select(i => (i.ProfileId, Date: i.OccurredAt.Date))
+                    .Concat(appointments.Where(a => allowed.Contains(a.ProfileId) && a.StartsAt >= from && a.StartsAt < until)
+                        .Select(a => (a.ProfileId, Date: a.StartsAt.Date)))
+                    .Distinct().Count(),
                 quotations = events.Count(i => i.Type == "BaoGia"), won, lost,
                 winRate = won + lost == 0 ? 0d : (double)won / (won + lost)
             };

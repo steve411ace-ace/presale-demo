@@ -174,7 +174,12 @@ app.MapPost("/api/profiles", async (ProfileCreateDto dto, PresalesDbContext db) 
     if (await db.Profiles.AnyAsync(x => x.Name.ToLower() == dto.Name.Trim().ToLower())) return Results.Conflict("A profile with this name already exists. Choose a different name or open the existing profile.");
     if (dto.Locations < 0 || dto.EmployeeCount < 0) return Results.BadRequest("Locations and EmployeeCount must be non-negative integers.");
     var p = await ProfileFactory.Create(db, dto);
-    return Results.Created($"/api/profiles/{p.Id}", p);
+    var row = System.Text.Json.JsonSerializer.SerializeToElement(p, new System.Text.Json.JsonSerializerOptions { PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase });
+    var result = row.EnumerateObject().ToDictionary(x => x.Name, x => (object?)x.Value);
+    result["hasSurvey"] = false;
+    result["contactName"] = null;
+    result["contactEmail"] = null;
+    return Results.Created($"/api/profiles/{p.Id}", result);
 });
 
 app.MapPost("/api/profiles/{id:int}/duplicate", async (int id, PresalesDbContext db) =>
