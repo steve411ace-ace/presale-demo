@@ -8,7 +8,7 @@ window.SurveyUI=(()=>{
   let u;try{u=new URL(url,location.origin);}catch{return '';}
   if(!['https:','http:'].includes(u.protocol)||u.protocol==='http:'&&u.origin!==location.origin)return '';
   const src=escHtml(u.href);
-  if(type==='image')return `<img class="survey-media" src="${src}" alt="Hình minh họa OneNow" loading="lazy">`;
+  if(type==='image')return `<img class="survey-media${u.pathname==='/images/onenow-logo.png'?' survey-logo':''}" src="${src}" alt="Hình minh họa OneNow" loading="lazy">`;
   if(type==='video')return `<video class="survey-media" src="${src}" controls preload="metadata" playsinline></video>`;
   let embed='';
   if(type==='youtube'&&['youtube.com','www.youtube.com','youtu.be','www.youtube-nocookie.com'].includes(u.hostname)){

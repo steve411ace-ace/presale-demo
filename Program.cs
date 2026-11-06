@@ -15,7 +15,7 @@ app.Use(async (context, next) => {
     if (context.Request.Path.StartsWithSegments("/uploads")) {
         context.Response.Headers["X-Content-Type-Options"] = "nosniff";
         context.Response.Headers["Content-Security-Policy"] = "default-src 'none'; sandbox";
-        if (context.Request.Path.StartsWithSegments("/uploads/surveys"))
+        if (context.Request.Path.StartsWithSegments("/uploads/surveys") || context.Request.Path.StartsWithSegments("/uploads/attachments"))
             context.Response.Headers["Content-Disposition"] = "attachment";
     }
     await next();
@@ -23,6 +23,7 @@ app.Use(async (context, next) => {
 app.UseStaticFiles();
 
 SurveyApi.Map(app);
+CrmApi.Map(app);
 
 app.MapGet("/api/health", () => new { ok = true, app = "PresalesDemo", time = DateTime.UtcNow });
 
@@ -48,8 +49,7 @@ app.MapGet("/api/industries", () =>
     return Results.Ok(all);
 });
 
-app.MapGet("/api/profiles", async (PresalesDbContext db) =>
-    Results.Ok(await db.Profiles.OrderBy(p => p.Id).ToListAsync()));
+app.MapGet("/api/profiles", CrmApi.ListProfiles);
 
 app.MapGet("/api/profiles/{id:int}", async (int id, PresalesDbContext db) =>
 {
@@ -58,6 +58,8 @@ app.MapGet("/api/profiles/{id:int}", async (int id, PresalesDbContext db) =>
     return Results.Ok(new
     {
         p.Id, p.Name, p.Industry, p.Locations, p.EmployeeCount, p.IsDefault, p.IsDemoSample,
+        p.Status, p.DemoDate, p.Owner, p.FollowUpNote, p.UpdatedAt,
+        hasSurvey = await db.SurveyResponses.AnyAsync(x => x.ProfileId == id),
         p.AiSuggestionRequested, p.AiSuggestionRequestedAt,
         p.CompanyResearchRequested, p.CompanyResearchRequestedAt, p.CompanyResearchNote,
         details = new { systemInfo = p.SystemInfo, closingJson = p.ClosingJson, actionPlanJson = p.ActionPlanJson, prioConfirmedJson = p.PrioConfirmedJson, healthCsv = p.HealthCsv, prepCsv = p.PrepCsv, estimatorHead = p.EstimatorHead, estimatorDays = p.EstimatorDays, estimatorPeople = p.EstimatorPeople, payrollDeepAnswer = p.PayrollDeepAnswer },
@@ -204,11 +206,21 @@ app.MapPut("/api/profiles/{id:int}", async (int id, ProfileUpdateDto dto, Presal
     await db.SaveChangesAsync(); return Results.Ok(p);
 });
 
-app.MapDelete("/api/profiles/{id:int}", async (int id, PresalesDbContext db) =>
+app.MapDelete("/api/profiles/{id:int}", async (int id, PresalesDbContext db, IWebHostEnvironment env) =>
 {
     var p = await db.Profiles.FindAsync(id);
     if (p is null) return Results.NotFound();
     if (p.IsDefault) return Results.BadRequest("Không xóa hồ sơ mặc định theo ngành. Hãy nhân bản trước rồi làm việc trên bản sao.");
+    await using var tx = await db.Database.BeginTransactionAsync();
+    var surveys = await db.SurveyResponses.Where(x => x.ProfileId == id).ToListAsync();
+    // Stage directories by rename so DB failure can restore files. Filesystems do not enlist in SQL transactions.
+    using var files = new CrmApi.StagedFiles(app.Logger);
+    foreach (var survey in surveys) files.Stage(Path.Combine(env.WebRootPath, "uploads", "surveys", survey.Id.ToString()));
+    files.Stage(Path.Combine(env.WebRootPath, "uploads", "attachments", id.ToString()));
+    db.SurveyResponses.RemoveRange(surveys);
+    db.Interactions.RemoveRange(db.Interactions.Where(x => x.ProfileId == id));
+    db.DemoAppointments.RemoveRange(db.DemoAppointments.Where(x => x.ProfileId == id));
+    db.Attachments.RemoveRange(db.Attachments.Where(x => x.ProfileId == id));
     db.DiscoveryItems.RemoveRange(db.DiscoveryItems.Where(x => x.ProfileId == id));
     db.Priorities.RemoveRange(db.Priorities.Where(x => x.ProfileId == id));
     db.Scenarios.RemoveRange(db.Scenarios.Where(x => x.ProfileId == id));
@@ -217,7 +229,7 @@ app.MapDelete("/api/profiles/{id:int}", async (int id, PresalesDbContext db) =>
     db.Actions.RemoveRange(db.Actions.Where(x => x.ProfileId == id));
     db.FollowUps.RemoveRange(db.FollowUps.Where(x => x.ProfileId == id));
     db.ChecklistItems.RemoveRange(db.ChecklistItems.Where(x => x.ProfileId == id));
-    db.Profiles.Remove(p); await db.SaveChangesAsync(); return Results.NoContent();
+    db.Profiles.Remove(p); await db.SaveChangesAsync(); await tx.CommitAsync(); files.Commit(); return Results.NoContent();
 });
 
 app.MapPut("/api/profiles/{id:int}/discovery/{itemId:int}", async (int id, int itemId, DiscoveryUpdateDto dto, PresalesDbContext db) =>
@@ -406,6 +418,8 @@ try
     // Add columns added after the DB was first created, without dropping data.
     var addCols = new (string Table, string Col, string Type)[]
     {
+        ("Profiles", "Status", "nvarchar(20)"), ("Profiles", "DemoDate", "datetime2"),
+        ("Profiles", "Owner", "nvarchar(100)"), ("Profiles", "FollowUpNote", "nvarchar(1000)"),
         ("Profiles", "CompanyResearchRequested", "bit"), ("Profiles", "CompanyResearchRequestedAt", "datetime2"),
         ("Profiles", "CompanyResearchNote", "nvarchar(max)"),
         ("Profiles", "AiSuggestionRequested", "bit"), ("Profiles", "AiSuggestionRequestedAt", "datetime2"),
@@ -420,11 +434,14 @@ try
     };
     foreach (var (table, col, type) in addCols)
     {
-        var definition = col is "AiSuggestionRequestedAt" or "CompanyResearchRequestedAt" ? "datetime2 NULL"
+        var definition = col == "Status" ? "nvarchar(20) NOT NULL DEFAULT N'DangChuanBi'"
+            : col is "DemoDate" or "Owner" or "FollowUpNote" ? $"{type} NULL"
+            : col is "AiSuggestionRequestedAt" or "CompanyResearchRequestedAt" ? "datetime2 NULL"
             : col is "AiSuggestionRequested" or "CompanyResearchRequested" ? "bit NOT NULL DEFAULT 0"
             : $"{type} NOT NULL DEFAULT ''";
         try { db.Database.ExecuteSqlRaw($"IF COL_LENGTH('{table}', '{col}') IS NULL ALTER TABLE [{table}] ADD [{col}] {definition}"); } catch { }
     }
+    await CrmApi.Initialize(db);
     await SurveyApi.Initialize(db);
     SeedDataExtra.Seed(db);
     // Sync ONLY untouched default-profile priorities to the frontend template

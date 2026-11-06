@@ -80,3 +80,40 @@ CREATE TABLE [dbo].[SurveyPresentations] (
 [MediaType] nvarchar(max) NULL
 );
 GO
+
+-- CRM: primary schema source. Program.cs addCols migrates profile metadata at startup.
+IF COL_LENGTH('Profiles','Status') IS NULL ALTER TABLE Profiles ADD Status nvarchar(20) NOT NULL DEFAULT N'DangChuanBi';
+IF COL_LENGTH('Profiles','DemoDate') IS NULL ALTER TABLE Profiles ADD DemoDate datetime2 NULL;
+IF COL_LENGTH('Profiles','Owner') IS NULL ALTER TABLE Profiles ADD Owner nvarchar(100) NULL;
+IF COL_LENGTH('Profiles','FollowUpNote') IS NULL ALTER TABLE Profiles ADD FollowUpNote nvarchar(1000) NULL;
+-- BEGIN CRM TABLES
+IF OBJECT_ID(N'Interactions', N'U') IS NULL
+BEGIN
+CREATE TABLE Interactions (
+ Id int IDENTITY PRIMARY KEY, ProfileId int NOT NULL REFERENCES Profiles(Id) ON DELETE CASCADE,
+ Type nvarchar(20) NOT NULL, OccurredAt datetime2 NOT NULL, Note nvarchar(2000) NOT NULL,
+ CreatedBy nvarchar(100) NULL, CreatedAt datetime2 NOT NULL
+);
+CREATE INDEX IX_Interactions_ProfileId ON Interactions(ProfileId);
+END;
+IF OBJECT_ID(N'DemoAppointments', N'U') IS NULL
+BEGIN
+CREATE TABLE DemoAppointments (
+ Id int IDENTITY PRIMARY KEY, ProfileId int NOT NULL REFERENCES Profiles(Id) ON DELETE CASCADE,
+ Title nvarchar(200) NOT NULL, StartsAt datetime2 NOT NULL, EndsAt datetime2 NULL,
+ Location nvarchar(1000) NULL, Notes nvarchar(2000) NULL, ReminderMinutes int NULL DEFAULT 60,
+ Status nvarchar(20) NOT NULL, CreatedAt datetime2 NOT NULL
+);
+CREATE INDEX IX_DemoAppointments_ProfileId ON DemoAppointments(ProfileId);
+END;
+IF OBJECT_ID(N'Attachments', N'U') IS NULL
+BEGIN
+CREATE TABLE Attachments (
+ Id int IDENTITY PRIMARY KEY, ProfileId int NOT NULL REFERENCES Profiles(Id) ON DELETE CASCADE,
+ FileName nvarchar(255) NOT NULL, StoredName nvarchar(255) NOT NULL, Size bigint NOT NULL,
+ ContentType nvarchar(200) NOT NULL, UploadedAt datetime2 NOT NULL
+);
+CREATE INDEX IX_Attachments_ProfileId ON Attachments(ProfileId);
+END;
+
+-- END CRM TABLES

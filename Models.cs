@@ -8,6 +8,10 @@ public class CustomerProfile
     public int Id { get; set; }
     [MaxLength(200)] public string Name { get; set; } = "";
     [MaxLength(50)] public string Industry { get; set; } = "";
+    [MaxLength(20)] public string Status { get; set; } = "DangChuanBi";
+    public DateTime? DemoDate { get; set; }
+    [MaxLength(100)] public string? Owner { get; set; }
+    [MaxLength(1000)] public string? FollowUpNote { get; set; }
     public int Locations { get; set; }
     public int EmployeeCount { get; set; }
     // Per-profile details previously session-only in the frontend. Stored as
@@ -195,3 +199,39 @@ public class SurveyPresentation
     public string? MediaUrl { get; set; } = "/images/onenow-logo.png";
     public string? MediaType { get; set; } = "image";
 }
+
+public class Interaction
+{
+    public int Id { get; set; }
+    public int ProfileId { get; set; }
+    [MaxLength(20)] public string Type { get; set; } = "GhiChu";
+    public DateTime OccurredAt { get; set; } = DateTime.UtcNow;
+    [MaxLength(2000)] public string Note { get; set; } = "";
+    [MaxLength(100)] public string? CreatedBy { get; set; }
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+}
+public class DemoAppointment
+{
+    public int Id { get; set; }
+    public int ProfileId { get; set; }
+    [MaxLength(200)] public string Title { get; set; } = "";
+    public DateTime StartsAt { get; set; }
+    public DateTime? EndsAt { get; set; }
+    [MaxLength(1000)] public string? Location { get; set; }
+    [MaxLength(2000)] public string? Notes { get; set; }
+    public int? ReminderMinutes { get; set; } = 60;
+    [MaxLength(20)] public string Status { get; set; } = "SapDienRa";
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+}
+public class Attachment
+{
+    public int Id { get; set; }
+    public int ProfileId { get; set; }
+    [MaxLength(255)] public string FileName { get; set; } = "";
+    [MaxLength(255)] public string StoredName { get; set; } = "";
+    public long Size { get; set; }
+    [MaxLength(200)] public string ContentType { get; set; } = "application/octet-stream";
+    public DateTime UploadedAt { get; set; } = DateTime.UtcNow;
+}
+// JsonElement preserves omitted fields versus explicit null when patching CRM metadata.
+public record StatusDto(string Status, System.Text.Json.JsonElement DemoDate, System.Text.Json.JsonElement Owner, System.Text.Json.JsonElement FollowUpNote);

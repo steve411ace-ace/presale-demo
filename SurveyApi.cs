@@ -236,6 +236,7 @@ public static class SurveyApi
             var employees=new Dictionary<string,int>{{"Dưới 50",25},{"50–200",100},{"200–500",300},{"500–1.000",700},{"Trên 1.000",1500}};
             var locations=new Dictionary<string,int>{{"1",1},{"2–5",3},{"6–20",10},{"Trên 20",25}};
             profile=await ProfileFactory.Create(db,new ProfileCreateDto(company,industry,locations.GetValueOrDefault(Get(4)),employees.GetValueOrDefault(Get(3))));
+            profile.Status="MoiKhaoSat";
             profile.SystemInfo=Get(5);
             var pain=Get(6);
             foreach(var item in await db.DiscoveryItems.Where(x=>x.ProfileId==profile.Id).ToListAsync()){
