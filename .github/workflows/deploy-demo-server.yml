@@ -124,23 +124,23 @@ jobs:
           if (-not $file) { throw 'Thu muc survey-media khong con file sau deploy.' }
           Write-Host 'Survey media directory exists and contains files.'
 
-      - name: Check local API health
-        id: local_health
+      - name: Check public API health
+        id: public_api_health
         run: |
           $ErrorActionPreference = 'Stop'
-          $uri = "http://localhost:$($env:PORT)/api/health"
+          $uri = "$($env:PUBLIC_URL)/api/health"
           for ($attempt = 1; $attempt -le 3; $attempt++) {
             try {
               $response = Invoke-WebRequest -Uri $uri -UseBasicParsing -TimeoutSec 30
               $body = $response.Content | ConvertFrom-Json
               if ($response.StatusCode -ne 200 -or $body.ok -isnot [bool] -or $body.ok -ne $true) {
-                throw 'Expected HTTP 200 and JSON ok=true.'
+                throw 'API public phai tra HTTP 200 va JSON ok dung kieu bool, bang true.'
               }
-              Write-Host 'Local API health: HTTP 200, ok=true.'
+              Write-Host 'Public API health: HTTP 200, ok=true.'
               break
             } catch {
               if ($attempt -eq 3) { throw }
-              Write-Warning "Local health attempt $attempt failed; retrying in 5 seconds."
+              Write-Warning "Kiem tra API public lan $attempt that bai; thu lai sau 5 giay."
               Start-Sleep -Seconds 5
             }
           }
@@ -156,10 +156,35 @@ jobs:
             Write-Host "Public health: $uri returned HTTP 200."
           }
 
+      - name: Verify served index.html matches published file
+        id: served_hash
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $publishedFile = Join-Path $env:PUBLISH_PATH 'wwwroot\index.html'
+          if (-not (Test-Path -LiteralPath $publishedFile -PathType Leaf)) {
+            throw "Khong tim thay file index.html da publish: $publishedFile"
+          }
+          $publishedHash = (Get-FileHash -LiteralPath $publishedFile -Algorithm SHA256).Hash
+          $servedFile = Join-Path $env:TEMP ("presales-index-{0}.html" -f [Guid]::NewGuid().ToString('N'))
+          $uri = "$($env:PUBLIC_URL)/index.html?cb=$([Guid]::NewGuid().ToString('N'))"
+          try {
+            Invoke-WebRequest -Uri $uri -UseBasicParsing -TimeoutSec 30 -OutFile $servedFile
+            $servedHash = (Get-FileHash -LiteralPath $servedFile -Algorithm SHA256).Hash
+            if ($publishedHash -ne $servedHash) {
+              throw "Site dang phuc vu file cu, publish chua toi dung thu muc IIS. Published hash: $publishedHash, served hash: $servedHash."
+            }
+            Write-Host "Served index.html matches published file. SHA256: $publishedHash"
+          } finally {
+            if (Test-Path -LiteralPath $servedFile -PathType Leaf) {
+              Remove-Item -LiteralPath $servedFile -Force
+            }
+          }
+
       - name: Write deployment summary
         if: ${{ always() }}
         env:
-          LOCAL_HEALTH_RESULT: ${{ steps.local_health.outcome }}
+          PUBLIC_API_HEALTH_RESULT: ${{ steps.public_api_health.outcome }}
+          SERVED_HASH_RESULT: ${{ steps.served_hash.outcome }}
           PUBLIC_HEALTH_RESULT: ${{ steps.public_health.outcome }}
           DEPLOY_RESULT: ${{ job.status }}
         run: |
@@ -174,7 +199,8 @@ jobs:
           - Site: $env:SITE_NAME
           - Port: $env:PORT
           - Publish directory: $env:PUBLISH_PATH
-          - Local API health: $env:LOCAL_HEALTH_RESULT
+          - Public API health: $env:PUBLIC_API_HEALTH_RESULT
+          - Served index.html hash match: $env:SERVED_HASH_RESULT
           - Public health ($env:PUBLIC_URL/ and /khao-sat.html): $env:PUBLIC_HEALTH_RESULT
           - Started (UTC): $env:DEPLOY_STARTED_AT
           - Finished (UTC): $($finished.ToString('o'))
