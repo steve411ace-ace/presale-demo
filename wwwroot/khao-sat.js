@@ -51,7 +51,7 @@ function render(){
  const v=answers[q.id];
  let body='';
  if(q.type==='question_group')body=parse(q.fieldsJson).map((f,i)=>`<label class="group-field"><span>${e(f.label)}${f.required?' *':''}</span>${input(f,v?.[f.key],'field-'+i)}</label>`).join('');
- else if(['single_choice','multi_choice','picture_choice','yes_no'].includes(q.type))body=(q.type==='single_choice'?'<p class="hint">Chọn 1 đáp án</p>':q.type==='multi_choice'?'<p class="hint">'+(q.id===6&&industryValues(q.industryOptions)?'Gợi ý cho ngành '+e(answers[2]):'Chọn nhiều đáp án — có thể chọn nhiều mục')+'</p>':'')+'<div class="choices choices--'+q.type+'">'+opts.map((o,i)=>`<button type="button" data-choice="${i}" class="${(Array.isArray(v)?v.includes(o.text):v===o.text)?'selected':''}" aria-pressed="${Array.isArray(v)?v.includes(o.text):v===o.text}">${['single_choice','multi_choice'].includes(q.type)?'<span class="choice-control" aria-hidden="true"></span>':''}${q.type==='picture_choice'?'<span class="choice-icon">'+e(o.icon||'▧')+'</span>':''}<b>${i<6?String.fromCharCode(65+i):i+1}</b> ${e(o.text)}</button>`).join('')+'</div>'+(q.id===2&&v==='Khác'?'<label>Ngành khác của anh/chị'+input({type:'short_text'},answers.industryOther,'industry-other')+'</label>':'');
+ else if(['single_choice','multi_choice','picture_choice','yes_no'].includes(q.type))body=(q.type==='single_choice'?'<p class="hint">Chọn 1 đáp án</p>':q.type==='multi_choice'?'<p class="hint">'+(q.id===6&&industryValues(q.industryOptions)?'Gợi ý cho ngành '+e(answers[2]):'Chọn nhiều đáp án — có thể chọn nhiều mục')+'</p>':'')+'<div class="choices choices--'+q.type+'">'+opts.map((o,i)=>`<button type="button" data-choice="${i}" class="${(Array.isArray(v)?v.includes(o.text):v===o.text)?'selected':''}" aria-pressed="${Array.isArray(v)?v.includes(o.text):v===o.text}">${['single_choice','multi_choice'].includes(q.type)?'<span class="choice-control" aria-hidden="true"></span>':''}${q.type==='picture_choice'?'<span class="choice-icon">'+e(o.icon||'▧')+'</span>':''}<b>${i<6?String.fromCharCode(65+i):i+1}</b> ${e(o.text)}</button>`).join('')+'</div>'+(q.id===2&&v==='Khác'?'<label>Ngành khác của anh/chị *'+input({type:'short_text'},answers.industryOther,'industry-other')+'</label>':'');
  else if(q.type==='dropdown')body='<select id="value"><option value="">Chọn...</option>'+opts.map(o=>`<option ${v===o.text?'selected':''}>${e(o.text)}</option>`).join('')+'</select>';
  else if(q.type==='rating'||q.type==='scale'){
   const min=q.type==='rating'?1:0,max=q.scaleMax||(q.type==='rating'?5:10);
@@ -96,7 +96,7 @@ function next(){
  capture();const q=questions[step],v=answers[q.id];
  if(!form.reportValidity())return;
  if(q.required&&(v==null||v===''||Array.isArray(v)&&v.length===0)){fail('Anh/chị vui lòng trả lời câu bắt buộc.');return;}
- if(q.id===2&&v==='Khác'){fail('Anh/chị vui lòng chọn 1 trong 4 ngành Logistic, FnB, Hotel, Sản xuất để chuẩn bị demo; ngành Khác chưa được hỗ trợ.');return;}
+ if(q.id===2&&v==='Khác'&&((answers.industryOther||'').length<2||!/\p{L}/u.test(answers.industryOther))){fail('Anh/chị vui lòng nhập ngành của công ty (ít nhất 2 ký tự và có ít nhất 1 chữ cái).');return;}
  if(document.getElementById('file')?.disabled){fail('Anh/chị vui lòng chờ file tải lên xong.');return;}
  if(q.type==='phone'&&v&&!/^\+?[0-9 ()-]+$/.test(v)||q.type==='phone'&&v&&(v.replace(/\D/g,'').length<9||v.replace(/\D/g,'').length>12)){fail('Số điện thoại cần 9–12 chữ số.');return;}
  if(q.type==='question_group')for(const f of parse(q.fieldsJson)){const x=v?.[f.key];
@@ -110,7 +110,7 @@ function next(){
 async function submit(){
  if(sending)return;sending=true;document.getElementById('submit').disabled=true;fail('');
  const payload=Object.fromEntries(questions.filter(q=>answers[q.id]!=null).map(q=>[q.id,answers[q.id]]));
- try{await api('/api/surveys','POST',{answers:payload,uploadToken});thanks();}
+ try{await api('/api/surveys','POST',{answers:payload,uploadToken,industryOther:answers[2]==='Khác'?answers.industryOther:undefined});thanks();}
  catch(err){if(err.status===409&&err.data?.surveyId)thanks();else{fail(err.message);if(err.data?.questionId){step=questions.findIndex(q=>q.id===err.data.questionId);render();fail(err.message);}else document.getElementById('submit').disabled=false;}}
  finally{sending=false;}
 }
