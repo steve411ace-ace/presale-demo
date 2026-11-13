@@ -48,6 +48,35 @@ jobs:
 
       - name: Checkout source
         uses: actions/checkout@v4
+        with:
+          clean: true
+          fetch-depth: 0
+
+      - name: Verify checkout is current
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $head = (git rev-parse HEAD).Trim()
+          if ($LASTEXITCODE -ne 0) { throw 'Unable to read checkout HEAD.' }
+          if ($head -ne $env:GITHUB_SHA) {
+            throw "Checkout is stale: HEAD $head != GITHUB_SHA $env:GITHUB_SHA."
+          }
+          $status = @(git status --porcelain)
+          if ($LASTEXITCODE -ne 0) { throw 'Unable to read checkout status.' }
+          $trackedChanges = @($status | Where-Object { -not $_.StartsWith('??') })
+          if ($trackedChanges.Count -gt 0) {
+            throw "Checkout has local tracked changes:`n$($trackedChanges -join "`n")"
+          }
+          $untrackedFiles = @($status | Where-Object { $_.StartsWith('??') })
+          if ($untrackedFiles.Count -gt 0) {
+            Write-Warning "Checkout has untracked files:`n$($untrackedFiles -join "`n")"
+          }
+          $sourceFile = Join-Path $env:GITHUB_WORKSPACE 'wwwroot\index.html'
+          $sourceHash = (Get-FileHash -LiteralPath $sourceFile -Algorithm SHA256).Hash
+          $sourceLastWriteTime = (Get-Item -LiteralPath $sourceFile).LastWriteTimeUtc.ToString('o')
+          "- Checkout SHA: $head" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Encoding utf8 -Append
+          "- Checkout index.html SHA256: $sourceHash" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Encoding utf8 -Append
+          "- Checkout index.html LastWriteTime UTC: $sourceLastWriteTime" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Encoding utf8 -Append
+          Write-Host "Checkout matches GITHUB_SHA: $head"
 
       - name: Check .NET 8 SDK
         run: |
@@ -95,6 +124,28 @@ jobs:
           $global:LASTEXITCODE = 0
           .\deploy-to-iis.ps1 -SiteName $env:SITE_NAME -Port $env:PORT -PublishPath $env:PUBLISH_PATH -SqlInstance $env:SQL_INSTANCE -Database $env:DATABASE
           if ($LASTEXITCODE -ne 0) { throw "Deployment native command failed with exit code $LASTEXITCODE" }
+
+      - name: Verify published file matches checkout source
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $sourceFile = Join-Path $env:GITHUB_WORKSPACE 'wwwroot\index.html'
+          $publishedFile = Join-Path $env:PUBLISH_PATH 'wwwroot\index.html'
+          if (-not (Test-Path -LiteralPath $sourceFile -PathType Leaf)) {
+            throw "Checkout source file not found: $sourceFile"
+          }
+          if (-not (Test-Path -LiteralPath $publishedFile -PathType Leaf)) {
+            throw "Published file not found: $publishedFile"
+          }
+          $sourceHash = (Get-FileHash -LiteralPath $sourceFile -Algorithm SHA256).Hash
+          $publishedHash = (Get-FileHash -LiteralPath $publishedFile -Algorithm SHA256).Hash
+          "CHECKOUT_INDEX_HASH=$sourceHash" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "PUBLISHED_INDEX_HASH=$publishedHash" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "- Checkout index.html SHA256: $sourceHash" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Encoding utf8 -Append
+          "- Published index.html SHA256: $publishedHash" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Encoding utf8 -Append
+          if ($sourceHash -ne $publishedHash) {
+            throw "Published file does not match checked-out source. Checkout hash: $sourceHash, published hash: $publishedHash."
+          }
+          Write-Host "Published index.html matches checked-out source. SHA256: $sourceHash"
 
       - name: Restore published appsettings.json
         if: ${{ always() && steps.backup.outcome == 'success' }}
@@ -291,6 +342,7 @@ jobs:
         env:
           PUBLIC_API_HEALTH_RESULT: ${{ steps.public_api_health.outcome }}
           SERVED_HASH_RESULT: ${{ steps.served_hash.outcome }}
+          CHECKOUT_INDEX_HASH: ${{ env.CHECKOUT_INDEX_HASH }}
           PUBLISHED_INDEX_HASH: ${{ env.PUBLISHED_INDEX_HASH }}
           SERVED_INDEX_HASH: ${{ env.SERVED_INDEX_HASH }}
           PUBLIC_HEALTH_RESULT: ${{ steps.public_health.outcome }}
@@ -301,6 +353,7 @@ jobs:
           if ($env:DEPLOY_STARTED_AT) {
             $duration = '{0:N1} seconds' -f ($finished - [DateTime]::Parse($env:DEPLOY_STARTED_AT).ToUniversalTime()).TotalSeconds
           }
+          $checkoutHashDisplay = if ($env:CHECKOUT_INDEX_HASH) { $env:CHECKOUT_INDEX_HASH } else { 'Unavailable' }
           $publishedHashDisplay = if ($env:PUBLISHED_INDEX_HASH) { $env:PUBLISHED_INDEX_HASH } else { 'Unavailable' }
           $servedHashDisplay = if ($env:SERVED_INDEX_HASH) { $env:SERVED_INDEX_HASH } else { 'Unavailable' }
           @"
@@ -311,6 +364,7 @@ jobs:
           - Publish directory: $env:PUBLISH_PATH
           - Public API health: $env:PUBLIC_API_HEALTH_RESULT
           - Served index.html hash match: $env:SERVED_HASH_RESULT
+          - Checkout index.html SHA256: $checkoutHashDisplay
           - Published index.html SHA256: $publishedHashDisplay
           - Served index.html SHA256: $servedHashDisplay
           - Public health ($env:PUBLIC_URL/ and /khao-sat.html): $env:PUBLIC_HEALTH_RESULT
