@@ -1839,11 +1839,11 @@ function derivedStory(sc){
 function storyFor(sc,i){
   // Only a saved edited story wins. An unedited profile keeps the rich template story,
   // even though its DB StorySteps (seed short story) differs.
-  if(sc._storyEdited && sc._story){
+  if(sc && sc._storyEdited && sc._story){
     var parts=String(sc._story).split("|");
     if(parts.length>=5) return {open:parts[0], screen:parts[1], action:parts[2], result:parts[3], close:parts.slice(4).join("|")};
   }
-  if(sc._edited){
+  if(sc && sc._edited){
     var d=derivedStory(sc).split("|");
     return {open:d[0], screen:d[1], action:d[2], result:d[3], close:d.slice(4).join("|")};
   }
@@ -1856,10 +1856,12 @@ function renderStory(){
   var steps=[["1 · Câu mở đầu","open"],["2 · Màn hình OneNow cần mở","screen"],["3 · Thao tác chính","action"],["4 · Kết quả cần chỉ cho khách thấy","result"],["5 · Câu hỏi chốt","close"]];
   box.innerHTML = stories.map(function(st,i){
     var tm=state.storyTimers[i];
-    var sc=scens[i];
+    var sc=scens[i]||{};
+    var templateSc=((INDUSTRIES[state.ind]||{}).scenarios||[])[i]||{};
+    var title=sc.t||templateSc.title||"Bài "+(i+1);
     st=storyFor(sc,i);
     var showEdited = !!(sc._edited || sc._storyEdited);
-    return '<article class="card"><span class="disc-num">CHẾ ĐỘ KỂ CHUYỆN · BÀI '+(i+1)+' — ĐI TỪNG BƯỚC, KHÔNG ĐỌC KỊCH BẢN DÀI</span><h3 style="margin-top:4px">'+scens[i].t.replace(/</g,"&lt;")+'</h3>' + (showEdited?'<p style="font-size:12.5px;color:var(--muted)">Bài này đã sửa ở Builder nên bước kể chuyện dưới đây lấy trực tiếp từ Pain / Solution / Outcome / Value mới — không còn lời kể cũ của bài cũ, và đã lưu qua server nên tải lại trang vẫn giữ.</p>':'')
+    return '<article class="card"><span class="disc-num">CHẾ ĐỘ KỂ CHUYỆN · BÀI '+(i+1)+' — ĐI TỪNG BƯỚC, KHÔNG ĐỌC KỊCH BẢN DÀI</span><h3 style="margin-top:4px">'+title.replace(/</g,"&lt;")+'</h3>' + (showEdited?'<p style="font-size:12.5px;color:var(--muted)">Bài này đã sửa ở Builder nên bước kể chuyện dưới đây lấy trực tiếp từ Pain / Solution / Outcome / Value mới — không còn lời kể cũ của bài cũ, và đã lưu qua server nên tải lại trang vẫn giữ.</p>':'')
     +'<div class="story-steps">'+steps.map(function(sp){ return '<div class="story-step"><span class="sn">'+sp[0].charAt(0)+'</span><div><b>'+sp[0].substring(4)+'</b>'+st[sp[1]]+'</div></div>'; }).join("")+'</div>'
     +'<div class="story-timer" id="stBox'+i+'"><span style="font-size:12px;font-weight:700">ĐỒNG HỒ CỦA BÀI</span><span class="st" id="stTime'+i+'">'+fmt(tm.sec)+'</span><span class="st-msg" id="stMsg'+i+'" style="font-size:13px">Ngân sách 10 phút cho bài này (2′ vấn đề · 5′ thao tác · 2′ kết quả · 1′ chốt).</span><span style="flex:1"></span><button class="btn small st-start" data-i="'+i+'">Bắt đầu bài</button><button class="btn ghost small st-pause" data-i="'+i+'">Dừng</button><button class="btn ghost small st-reset" data-i="'+i+'">Đặt lại 10:00</button></div></article>';
   }).join("");
@@ -1886,9 +1888,12 @@ function renderCompare(slidesOnly){
   var ba=BEFORE_AFTER[state.ind]||[];
   var scens=getScenarios(state.ind);
   box.innerHTML = ba.map(function(x,i){
-    var beforeTxt=scens[i]._before!==undefined?scens[i]._before:x.before;
-    var afterTxt=scens[i]._after!==undefined?scens[i]._after:x.after;
-    return '<article class="card"><span class="disc-num">SO SÁNH TRƯỚC / SAU · BÀI '+(i+1)+'</span><h3 style="margin-top:4px">'+scens[i].t.replace(/</g,"&lt;")+'</h3><div class="ba-grid"><div class="before"><b>Trước — cách làm hiện tại (giả định dựng demo, kiểm chứng ở Discovery)</b><p>'+beforeTxt+'</p></div><div class="after"><b>Sau — với OneNow (quy trình thay đổi, không hứa con số thời gian)</b><p>'+afterTxt+'</p></div></div>'+demoSlideSlot(i)+'<div class="grid2" style="margin-top:10px"><div><label class="f">Sửa “Trước” của bài này (lưu theo bài, tải lại vẫn còn)</label><textarea class="ba-before" data-i="'+i+'">'+beforeTxt+'</textarea></div><div><label class="f">Sửa “Sau” của bài này (lưu theo bài, tải lại vẫn còn)</label><textarea class="ba-after" data-i="'+i+'">'+afterTxt+'</textarea></div></article>';
+    var sc=scens[i]||{};
+    var templateSc=((INDUSTRIES[state.ind]||{}).scenarios||[])[i]||{};
+    var title=sc.t||templateSc.title||"Bài "+(i+1);
+    var beforeTxt=sc._before!==undefined?sc._before:x.before;
+    var afterTxt=sc._after!==undefined?sc._after:x.after;
+    return '<article class="card"><span class="disc-num">SO SÁNH TRƯỚC / SAU · BÀI '+(i+1)+'</span><h3 style="margin-top:4px">'+title.replace(/</g,"&lt;")+'</h3><div class="ba-grid"><div class="before"><b>Trước — cách làm hiện tại (giả định dựng demo, kiểm chứng ở Discovery)</b><p>'+beforeTxt+'</p></div><div class="after"><b>Sau — với OneNow (quy trình thay đổi, không hứa con số thời gian)</b><p>'+afterTxt+'</p></div></div>'+demoSlideSlot(i)+'<div class="grid2" style="margin-top:10px"><div><label class="f">Sửa “Trước” của bài này (lưu theo bài, tải lại vẫn còn)</label><textarea class="ba-before" data-i="'+i+'">'+beforeTxt+'</textarea></div><div><label class="f">Sửa “Sau” của bài này (lưu theo bài, tải lại vẫn còn)</label><textarea class="ba-after" data-i="'+i+'">'+afterTxt+'</textarea></div></article>';
   }).join("");
   document.querySelectorAll(".ba-before").forEach(function(t){ t.addEventListener("input",function(){ var sc=getScenarios(state.ind)[parseInt(this.getAttribute("data-i"),10)]; sc._before=this.value; touchProfile(); renderPresenterSummary(); }); });
   document.querySelectorAll(".ba-after").forEach(function(t){ t.addEventListener("input",function(){ var sc=getScenarios(state.ind)[parseInt(this.getAttribute("data-i"),10)]; sc._after=this.value; touchProfile(); renderPresenterSummary(); }); });
