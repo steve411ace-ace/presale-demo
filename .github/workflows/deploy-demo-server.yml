@@ -165,11 +165,13 @@ jobs:
             throw "Khong tim thay file index.html da publish: $publishedFile"
           }
           $publishedHash = (Get-FileHash -LiteralPath $publishedFile -Algorithm SHA256).Hash
+          "PUBLISHED_INDEX_HASH=$publishedHash" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           $servedFile = Join-Path $env:TEMP ("presales-index-{0}.html" -f [Guid]::NewGuid().ToString('N'))
           $uri = "$($env:PUBLIC_URL)/index.html?cb=$([Guid]::NewGuid().ToString('N'))"
           try {
             Invoke-WebRequest -Uri $uri -UseBasicParsing -TimeoutSec 30 -OutFile $servedFile
             $servedHash = (Get-FileHash -LiteralPath $servedFile -Algorithm SHA256).Hash
+            "SERVED_INDEX_HASH=$servedHash" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
             if ($publishedHash -ne $servedHash) {
               throw "Site dang phuc vu file cu, publish chua toi dung thu muc IIS. Published hash: $publishedHash, served hash: $servedHash."
             }
@@ -180,11 +182,117 @@ jobs:
             }
           }
 
+      - name: Diagnose served files
+        id: diagnose
+        if: ${{ always() }}
+        run: |
+          $ErrorActionPreference = 'Continue'
+          function Write-Diagnostic($label, $value) {
+            "- ${label}: $value" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Encoding utf8 -Append
+          }
+          function Get-ShortError($record) {
+            $message = $record.Exception.Message -replace '[\r\n]+', ' '
+            $message.Substring(0, [Math]::Min(240, $message.Length))
+          }
+          '## Diagnose served files' | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Encoding utf8 -Append
+          $iisError = $null
+          try {
+            Import-Module WebAdministration -ErrorAction Stop
+          } catch {
+            $iisError = Get-ShortError $_
+            Write-Diagnostic 'Module IIS' "Unavailable: $iisError"
+          }
+          try {
+            if ($iisError) { throw $iisError }
+            if (Test-Path "IIS:\Sites\$env:SITE_NAME" -ErrorAction Stop) {
+              Write-Diagnostic 'Duong dan vat ly IIS' (Get-Item "IIS:\Sites\$env:SITE_NAME" -ErrorAction Stop).physicalPath
+            } else {
+              Write-Diagnostic 'Duong dan vat ly IIS' 'Site not found in IIS'
+            }
+          } catch {
+            Write-Diagnostic 'Duong dan vat ly IIS' "Unavailable: $(Get-ShortError $_)"
+          }
+          try {
+            if ($iisError) { throw $iisError }
+            $bindings = @(Get-WebBinding -Name $env:SITE_NAME -ErrorAction Stop | Select-Object protocol, bindingInformation)
+            if ($bindings.Count -eq 0) { Write-Diagnostic 'Binding IIS' 'Khong co binding' }
+            foreach ($binding in $bindings) {
+              Write-Diagnostic 'Binding IIS' "$($binding.protocol) $($binding.bindingInformation)"
+            }
+          } catch {
+            Write-Diagnostic 'Binding IIS' "Unavailable: $(Get-ShortError $_)"
+          }
+          try {
+            if ($iisError) { throw $iisError }
+            if (Test-Path "IIS:\AppPools\$env:SITE_NAME" -ErrorAction Stop) {
+              Write-Diagnostic 'Trang thai app pool' (Get-WebAppPoolState -Name $env:SITE_NAME -ErrorAction Stop).Value
+            } else {
+              Write-Diagnostic 'Trang thai app pool' 'App pool not found'
+            }
+          } catch {
+            Write-Diagnostic 'Trang thai app pool' "Unavailable: $(Get-ShortError $_)"
+          }
+          try {
+            $publishedFile = Join-Path $env:PUBLISH_PATH 'wwwroot\index.html'
+            if (Test-Path -LiteralPath $publishedFile -PathType Leaf -ErrorAction Stop) {
+              try {
+                Write-Diagnostic 'File publish SHA256' (Get-FileHash -LiteralPath $publishedFile -Algorithm SHA256 -ErrorAction Stop).Hash
+              } catch {
+                Write-Diagnostic 'File publish SHA256' "Unavailable: $(Get-ShortError $_)"
+              }
+              try {
+                Write-Diagnostic 'File publish sua cuoi UTC' (Get-Item -LiteralPath $publishedFile -ErrorAction Stop).LastWriteTimeUtc.ToString('o')
+              } catch {
+                Write-Diagnostic 'File publish sua cuoi UTC' "Unavailable: $(Get-ShortError $_)"
+              }
+              try {
+                $guard = if (Select-String -LiteralPath $publishedFile -Pattern 'sc && sc._storyEdited' -SimpleMatch -ErrorAction Stop) { 'Yes' } else { 'No' }
+                Write-Diagnostic 'File publish co guard' $guard
+              } catch {
+                Write-Diagnostic 'File publish co guard' "Unavailable: $(Get-ShortError $_)"
+              }
+            } else {
+              Write-Diagnostic 'File publish' 'Published file not found'
+            }
+          } catch {
+            Write-Diagnostic 'File publish' "Unavailable: $(Get-ShortError $_)"
+          }
+          $servedFile = $null
+          try {
+            $servedFile = Join-Path $env:TEMP ("presales-diagnose-{0}.html" -f [Guid]::NewGuid().ToString('N'))
+            $uri = "$($env:PUBLIC_URL)/index.html?cb=$([Guid]::NewGuid().ToString('N'))"
+            Invoke-WebRequest -Uri $uri -UseBasicParsing -TimeoutSec 30 -OutFile $servedFile -ErrorAction Stop
+            try {
+              Write-Diagnostic 'File phuc vu SHA256' (Get-FileHash -LiteralPath $servedFile -Algorithm SHA256 -ErrorAction Stop).Hash
+            } catch {
+              Write-Diagnostic 'File phuc vu SHA256' "Unavailable: $(Get-ShortError $_)"
+            }
+            try {
+              $guard = if (Select-String -LiteralPath $servedFile -Pattern 'sc && sc._storyEdited' -SimpleMatch -ErrorAction Stop) { 'Yes' } else { 'No' }
+              Write-Diagnostic 'File phuc vu co guard' $guard
+            } catch {
+              Write-Diagnostic 'File phuc vu co guard' "Unavailable: $(Get-ShortError $_)"
+            }
+          } catch {
+            Write-Diagnostic 'File phuc vu' "Download failed: $(Get-ShortError $_)"
+          } finally {
+            try {
+              if ($servedFile -and (Test-Path -LiteralPath $servedFile -PathType Leaf -ErrorAction Stop)) {
+                Remove-Item -LiteralPath $servedFile -Force -ErrorAction Stop
+              }
+            } catch {
+              Write-Diagnostic 'Xoa file tam' "Unavailable: $(Get-ShortError $_)"
+            }
+          }
+          exit 0
+
       - name: Write deployment summary
         if: ${{ always() }}
         env:
           PUBLIC_API_HEALTH_RESULT: ${{ steps.public_api_health.outcome }}
           SERVED_HASH_RESULT: ${{ steps.served_hash.outcome }}
+          PUBLISHED_INDEX_HASH: ${{ env.PUBLISHED_INDEX_HASH }}
+          SERVED_INDEX_HASH: ${{ env.SERVED_INDEX_HASH }}
           PUBLIC_HEALTH_RESULT: ${{ steps.public_health.outcome }}
           DEPLOY_RESULT: ${{ job.status }}
         run: |
@@ -193,6 +301,8 @@ jobs:
           if ($env:DEPLOY_STARTED_AT) {
             $duration = '{0:N1} seconds' -f ($finished - [DateTime]::Parse($env:DEPLOY_STARTED_AT).ToUniversalTime()).TotalSeconds
           }
+          $publishedHashDisplay = if ($env:PUBLISHED_INDEX_HASH) { $env:PUBLISHED_INDEX_HASH } else { 'Unavailable' }
+          $servedHashDisplay = if ($env:SERVED_INDEX_HASH) { $env:SERVED_INDEX_HASH } else { 'Unavailable' }
           @"
           ## Demo server deployment
           - Result: $env:DEPLOY_RESULT
@@ -201,6 +311,8 @@ jobs:
           - Publish directory: $env:PUBLISH_PATH
           - Public API health: $env:PUBLIC_API_HEALTH_RESULT
           - Served index.html hash match: $env:SERVED_HASH_RESULT
+          - Published index.html SHA256: $publishedHashDisplay
+          - Served index.html SHA256: $servedHashDisplay
           - Public health ($env:PUBLIC_URL/ and /khao-sat.html): $env:PUBLIC_HEALTH_RESULT
           - Started (UTC): $env:DEPLOY_STARTED_AT
           - Finished (UTC): $($finished.ToString('o'))
