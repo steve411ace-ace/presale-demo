@@ -8,6 +8,21 @@ namespace PresalesDemo;
 public static class SurveyApi
 {
     static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web);
+    static readonly Dictionary<string, string[]> IndustryPainPoints = new()
+    {
+        ["Logistic"] = new[] { "Chấm công đa điểm, thiếu log (kho / tuyến)", "Tính lương ca đêm, tăng ca, phụ cấp theo tuyến", "Xin phép / nghỉ phép cho tài xế & nhân viên kho", "Tuyển dụng lái xe / nhân viên kho", "BHXH & hợp đồng cho lao động lưu động", "Đánh giá / KPI theo tuyến / kho" },
+        ["FnB"] = new[] { "Chấm công & xếp ca theo cửa hàng", "Tính lương bán thời gian theo ca", "Đổi ca / thiếu log, duyệt trước giờ bán", "Xin phép / nghỉ phép trên ESS", "Tuyển dụng & mở cửa hàng mới nhanh", "Đánh giá / KPI theo cửa hàng" },
+        ["Hotel"] = new[] { "Chấm công ca 24/7 theo bộ phận", "Tính lương tăng ca lễ, phụ cấp ca đêm", "Nghỉ phép mùa cao điểm", "Hợp đồng thời vụ", "Tuyển dụng lễ tân / buồng phòng mùa cao điểm", "Đánh giá / KPI theo bộ phận" },
+        ["Sản xuất"] = new[] { "Chấm công nhà máy tập trung, công bất thường", "Tính lương theo công, tăng ca, phụ cấp ca", "Nghỉ phép theo ca sản xuất", "Hợp đồng & tái ký theo ca", "Tuyển dụng công nhân số lượng lớn", "BHXH & đánh giá năng suất" },
+    };
+    static readonly Dictionary<string, string[]> IndustryDemoSuggestions = new()
+    {
+        ["Logistic"] = new[] { "Chấm công đa điểm và xử lý thiếu log cho tài xế / nhân viên kho", "Tính lương ca đêm, tăng ca và phụ cấp theo tuyến, kiểm tra trước khi chốt", "Duyệt nghỉ phép và giải trình công trên điện thoại" },
+        ["FnB"] = new[] { "Chấm công và xếp ca theo từng cửa hàng, xử lý đổi ca / thiếu log", "Nghỉ phép trên ESS, số dư chạy đúng khi duyệt / từ chối / hủy", "Tính lương bán thời gian theo ca và phụ cấp từng cửa hàng" },
+        ["Hotel"] = new[] { "Chấm công ca 24/7 theo bộ phận và phát hiện thiếu log", "Nghỉ phép mùa cao điểm, duyệt theo bộ phận, số dư chính xác", "Tính lương tăng ca lễ, phụ cấp ca đêm và hợp đồng thời vụ" },
+        ["Sản xuất"] = new[] { "Chấm công nhà máy tập trung, phát hiện công bất thường và giải trình", "Tính lương theo công, tăng ca và phụ cấp ca, công thức 23 thành phần", "Quản lý hợp đồng, tái ký và nghỉ phép theo ca sản xuất" },
+        ["Khác"] = new[] { "Chấm công và tổng hợp công tự động", "Tính lương và kiểm tra sai lệch trước khi chốt", "Nghỉ phép và duyệt trên điện thoại" },
+    };
     public static readonly string[] Types = "short_text long_text single_choice multi_choice dropdown yes_no number email phone date rating scale ranking file_upload picture_choice question_group".Split(' ');
     static string Encode(object value) => JsonSerializer.Serialize(value, Json);
     static List<T> Read<T>(string value) => JsonSerializer.Deserialize<List<T>>(value ?? "[]", Json) ?? new();
@@ -28,8 +43,8 @@ public static class SurveyApi
             Q(2,"Công ty thuộc ngành nào?","single_choice",new[]{"Logistic","FnB","Hotel","Sản xuất","Khác"},true),
             Q(3,"Quy mô nhân sự?","single_choice",new[]{"Dưới 50","50–200","200–500","500–1.000","Trên 1.000"}),
             Q(4,"Số địa điểm / chi nhánh?","single_choice",new[]{"1","2–5","6–20","Trên 20"}),
-            Q(5,"Hiện tại công ty đang quản lý nhân sự bằng gì?","single_choice",new[]{"Excel","ezHR9","Phần mềm khác","Chưa có hệ thống"}),
-            Q(6,"Đau nhất hiện tại là gì?","multi_choice",new[]{"Chấm công","Tính lương","Xin phép / Nghỉ phép","Tuyển dụng","BHXH","Đánh giá / KPI"},true),
+            Q(5,"Hiện tại công ty đang quản lý nhân sự bằng gì?","single_choice",new[]{"Excel","Giấy tờ / sổ sách thủ công","Phần mềm nhân sự khác","Chưa có hệ thống"}),
+            Q(6,"Đau nhất hiện tại là gì?","multi_choice",new[]{"Chấm công","Tính lương","Xin phép - Nghỉ phép","Tuyển dụng","BHXH","Đánh giá - KPI"},true),
             Q(7,"Ca làm việc của công ty thế nào?","single_choice",new[]{"Hành chính","Ca xoay","Ca đêm","Hỗn hợp"}),
             Q(8,"Ai là người quyết định cuối cùng khi chọn phần mềm?","single_choice",new[]{"Tôi","Ban giám đốc","HR + IT cùng quyết","Chưa xác định"}),
             Q(9,"Anh/chị dự kiến khi nào sẽ áp dụng giải pháp mới?","single_choice",new[]{"Trong vòng 1 tháng","Trong 1–3 tháng","Trong 3–6 tháng","Sau 6 tháng","Đang tìm hiểu, chưa có thời gian cụ thể"}),
@@ -67,6 +82,21 @@ public static class SurveyApi
                 await db.Database.CloseConnectionAsync();
             }
         }
+        // Only migrate the legacy question options; historical responses are untouched.
+        var systemQuestion = await db.SurveyQuestions.FindAsync(5);
+        if (systemQuestion != null && Read<SurveyOption>(systemQuestion.OptionsJson).Any(o => o.Text == "ezHR9"))
+        {
+            systemQuestion.OptionsJson = Defaults().First(q => q.Id == 5).OptionsJson;
+            await db.SaveChangesAsync();
+        }
+    }
+    // Add API metadata without changing the entity or the Builder's editable options.
+    static object QuestionPayload(SurveyQuestion q)
+    {
+        var payload = JsonSerializer.Deserialize<Dictionary<string, object?>>(Encode(q), Json)!;
+        if (q.Id == 6) payload["industryOptions"] = IndustryPainPoints;
+        if (q.Id == 10) payload["industrySuggestions"] = IndustryDemoSuggestions;
+        return payload;
     }
     static string? DefinitionError(SurveyQuestion q)
     {
@@ -108,11 +138,21 @@ public static class SurveyApi
         if (Empty(value)) return q.Required ? "Anh/chị vui lòng trả lời câu bắt buộc." : null;
         var text=Text(value);
         var options=Read<SurveyOption>(q.OptionsJson).Select(o=>o.Text).ToArray();
+        if (q.Id == 6 && q.Type == "multi_choice")
+            options = options.Concat(Read<SurveyOption>(Defaults().First(x => x.Id == 6).OptionsJson).Select(o => o.Text))
+                .Concat(IndustryPainPoints.Values.SelectMany(x => x)).Distinct().ToArray();
         if (q.Type=="question_group") {
             if(value.ValueKind!=JsonValueKind.Object) return "Anh/chị vui lòng nhập thông tin nhóm.";
             foreach(var f in Read<SurveyField>(q.FieldsJson)) {
                 value.TryGetProperty(f.Key,out var child);
                 var error=Validate(new SurveyQuestion{Type=f.Type,Required=f.Required},child,uploadToken,env);
+                if(error==null && q.Id==1 && (f.Key is "contactName" or "companyName" or "role")) {
+                    var contactText=Text(child).Trim();
+                    if(contactText.Length>0) {
+                        if(contactText.Length<2) error="vui lòng nhập ít nhất 2 ký tự.";
+                        else if(!Regex.IsMatch(contactText,@"\p{L}")) error="vui lòng nhập ít nhất 1 chữ cái.";
+                    }
+                }
                 if(error!=null)return f.Label+": "+error;
             }
             return null;
@@ -153,7 +193,7 @@ public static class SurveyApi
             var settings=await db.SurveyPresentations.FirstAsync();settings.MediaUrl=q.MediaUrl;settings.MediaType=q.MediaType;
             await db.SaveChangesAsync();return Results.Ok(settings);
         });
-        app.MapGet("/api/survey-questions", async (bool? includeInactive,PresalesDbContext db)=>Results.Ok(await db.SurveyQuestions.Where(q=>includeInactive==true || q.IsActive).OrderBy(q=>q.SortOrder).ThenBy(q=>q.Id).ToListAsync()));
+        app.MapGet("/api/survey-questions", async (bool? includeInactive,PresalesDbContext db)=>Results.Ok((await db.SurveyQuestions.Where(q=>includeInactive==true || q.IsActive).OrderBy(q=>q.SortOrder).ThenBy(q=>q.Id).ToListAsync()).Select(QuestionPayload)));
         app.MapPost("/api/survey-questions", async (SurveyQuestion q,PresalesDbContext db)=>{
             q.Id=0; q.IsActive=true; q.SortOrder=(await db.SurveyQuestions.MaxAsync(x=>(int?)x.SortOrder)??0)+1;
             var error=DefinitionError(q); if(error!=null)return Results.BadRequest(error);
