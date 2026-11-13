@@ -1858,7 +1858,7 @@ function renderStory(){
     var tm=state.storyTimers[i];
     var sc=scens[i]||{};
     var templateSc=((INDUSTRIES[state.ind]||{}).scenarios||[])[i]||{};
-    var title=sc.t||templateSc.title||"Bài "+(i+1);
+    var title=sc.t||templateSc.t||templateSc.title||"Bài "+(i+1);
     st=storyFor(sc,i);
     var showEdited = !!(sc._edited || sc._storyEdited);
     return '<article class="card"><span class="disc-num">CHẾ ĐỘ KỂ CHUYỆN · BÀI '+(i+1)+' — ĐI TỪNG BƯỚC, KHÔNG ĐỌC KỊCH BẢN DÀI</span><h3 style="margin-top:4px">'+title.replace(/</g,"&lt;")+'</h3>' + (showEdited?'<p style="font-size:12.5px;color:var(--muted)">Bài này đã sửa ở Builder nên bước kể chuyện dưới đây lấy trực tiếp từ Pain / Solution / Outcome / Value mới — không còn lời kể cũ của bài cũ, và đã lưu qua server nên tải lại trang vẫn giữ.</p>':'')
@@ -1890,7 +1890,7 @@ function renderCompare(slidesOnly){
   box.innerHTML = ba.map(function(x,i){
     var sc=scens[i]||{};
     var templateSc=((INDUSTRIES[state.ind]||{}).scenarios||[])[i]||{};
-    var title=sc.t||templateSc.title||"Bài "+(i+1);
+    var title=sc.t||templateSc.t||templateSc.title||"Bài "+(i+1);
     var beforeTxt=sc._before!==undefined?sc._before:x.before;
     var afterTxt=sc._after!==undefined?sc._after:x.after;
     return '<article class="card"><span class="disc-num">SO SÁNH TRƯỚC / SAU · BÀI '+(i+1)+'</span><h3 style="margin-top:4px">'+title.replace(/</g,"&lt;")+'</h3><div class="ba-grid"><div class="before"><b>Trước — cách làm hiện tại (giả định dựng demo, kiểm chứng ở Discovery)</b><p>'+beforeTxt+'</p></div><div class="after"><b>Sau — với OneNow (quy trình thay đổi, không hứa con số thời gian)</b><p>'+afterTxt+'</p></div></div>'+demoSlideSlot(i)+'<div class="grid2" style="margin-top:10px"><div><label class="f">Sửa “Trước” của bài này (lưu theo bài, tải lại vẫn còn)</label><textarea class="ba-before" data-i="'+i+'">'+beforeTxt+'</textarea></div><div><label class="f">Sửa “Sau” của bài này (lưu theo bài, tải lại vẫn còn)</label><textarea class="ba-after" data-i="'+i+'">'+afterTxt+'</textarea></div></article>';
