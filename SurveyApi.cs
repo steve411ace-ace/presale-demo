@@ -89,6 +89,21 @@ public static class SurveyApi
             systemQuestion.OptionsJson = Defaults().First(q => q.Id == 5).OptionsJson;
             await db.SaveChangesAsync();
         }
+        var painQuestion = await db.SurveyQuestions.FindAsync(6);
+        if (painQuestion != null)
+        {
+            var options = Read<SurveyOption>(painQuestion.OptionsJson);
+            if (options.Any(o => o.Text is "Xin phép / Nghỉ phép" or "Đánh giá / KPI"))
+            {
+                painQuestion.OptionsJson = Encode(options.Select(o => o.Text switch
+                {
+                    "Xin phép / Nghỉ phép" => o with { Text = "Xin phép - Nghỉ phép" },
+                    "Đánh giá / KPI" => o with { Text = "Đánh giá - KPI" },
+                    _ => o
+                }));
+                await db.SaveChangesAsync();
+            }
+        }
     }
     // Add API metadata without changing the entity or the Builder's editable options.
     static object QuestionPayload(SurveyQuestion q)
