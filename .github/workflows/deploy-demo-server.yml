@@ -1,0 +1,182 @@
+# Windows runner name: demo-server; label: demo-server. MUST run with local Administrator privileges.
+# Install the runner on the demo server; outbound HTTPS to GitHub is sufficient.
+name: Deploy Presales Demo to demo server
+
+'on':
+  workflow_dispatch:
+
+env:
+  # Confirmed by An on 13/11: IIS site PresaleDemo differs from folder PresalesDemo and repo presale-demo.
+  SITE_NAME: 'PresaleDemo'
+  # Existing demo server port.
+  PORT: '9001'
+  # Confirmed by An on 13/11: IIS physical path, used as the publish directory.
+  # Source checkout uses the runner workspace independently of this path.
+  PUBLISH_PATH: 'C:\OneHR\PresalesDemo'
+  # SQL host WIN-7IFVHOS4KCR: SQLEXPRESS runs locally on the demo server.
+  # Script only performs CREATE DATABASE IF NOT EXISTS; the restored DB already exists, so this is a no-op.
+  SQL_INSTANCE: 'localhost\SQLEXPRESS'
+  # Existing application database name.
+  DATABASE: 'PresalesDemo'
+  # Public HTTPS base URL, without a trailing slash.
+  PUBLIC_URL: 'https://demo.ezhrsolution.com:9001'
+
+permissions:
+  contents: read
+
+# Prevent overlapping deployments from overwriting each other's configuration.
+concurrency:
+  group: deploy-demo-server
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    # The demo server runner name/label is demo-server; pin it to avoid deploying to another machine when more runners are added.
+    runs-on: [self-hosted, demo-server]
+    defaults:
+      run:
+        shell: powershell
+    steps:
+      - name: Log confirmed deployment settings
+        run: |
+          Write-Host "Site: $env:SITE_NAME"
+          Write-Host "Port: $env:PORT"
+          Write-Host "Publish directory: $env:PUBLISH_PATH"
+          Write-Host "SQL instance: $env:SQL_INSTANCE"
+          Write-Host "Database: $env:DATABASE"
+          "DEPLOY_STARTED_AT=$([DateTime]::UtcNow.ToString('o'))" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Check .NET 8 SDK
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if (-not (Get-Command dotnet -ErrorAction SilentlyContinue)) {
+            throw 'Can cai .NET 8 SDK tren server demo'
+          }
+          dotnet --version
+          if ($LASTEXITCODE -ne 0) { throw 'Can cai .NET 8 SDK tren server demo' }
+          $sdks = dotnet --list-sdks
+          if ($LASTEXITCODE -ne 0 -or -not ($sdks -match '^8\.0\.\d+\s')) {
+            throw 'Can cai .NET 8 SDK tren server demo'
+          }
+
+      - name: Check local Administrator privileges
+        run: |
+          $principal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
+          if (-not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+            throw 'Runner phai chay voi quyen Administrator local tren server demo.'
+          }
+
+      - name: Back up published appsettings.json
+        id: backup
+        run: |
+          $ErrorActionPreference = 'Stop'
+          # Publish overwrites appsettings.json with repository placeholders. The
+          # real connection string exists only in the server's published file.
+          # Never print it to logs or commit it to git; never pass a connection string
+          # argument to the deployment script. Preserve it via TEMP backup and always() restore.
+          # Never delete the publish directory (uploads live there).
+          $source = Join-Path $env:PUBLISH_PATH 'appsettings.json'
+          if (Test-Path -LiteralPath $source -PathType Leaf) {
+            $backup = Join-Path $env:TEMP ("presales-appsettings-{0}.json" -f [Guid]::NewGuid())
+            Copy-Item -LiteralPath $source -Destination $backup -ErrorAction Stop
+            "APPSETTINGS_BACKUP=$backup" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+            Write-Host 'Published appsettings.json backed up without exposing its contents.'
+          } else {
+            Write-Warning 'No published appsettings.json exists; skipping backup and restore. Deployment script configuration warning still applies.'
+          }
+
+      - name: Deploy to IIS
+        id: publish
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $global:LASTEXITCODE = 0
+          .\deploy-to-iis.ps1 -SiteName $env:SITE_NAME -Port $env:PORT -PublishPath $env:PUBLISH_PATH -SqlInstance $env:SQL_INSTANCE -Database $env:DATABASE
+          if ($LASTEXITCODE -ne 0) { throw "Deployment native command failed with exit code $LASTEXITCODE" }
+
+      - name: Restore published appsettings.json
+        if: ${{ always() && steps.backup.outcome == 'success' }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if ($env:APPSETTINGS_BACKUP -and (Test-Path -LiteralPath $env:APPSETTINGS_BACKUP -PathType Leaf)) {
+            Copy-Item -LiteralPath $env:APPSETTINGS_BACKUP -Destination (Join-Path $env:PUBLISH_PATH 'appsettings.json') -Force
+            # The deploy script already started IIS; reload the restored configuration.
+            Import-Module WebAdministration -ErrorAction Stop
+            if (Test-Path "IIS:\AppPools\$env:SITE_NAME") {
+              if ((Get-WebAppPoolState -Name $env:SITE_NAME).Value -eq 'Started') {
+                Restart-WebAppPool -Name $env:SITE_NAME
+              }
+            }
+            Remove-Item -LiteralPath $env:APPSETTINGS_BACKUP -Force
+            Write-Host 'Original published appsettings.json restored.'
+          }
+
+      - name: Verify uploaded survey media survived
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $mediaPath = Join-Path $env:PUBLISH_PATH 'wwwroot\uploads\survey-media'
+          if (-not (Test-Path -LiteralPath $mediaPath -PathType Container)) {
+            throw 'Thu muc survey-media bi mat sau deploy.'
+          }
+          $file = Get-ChildItem -LiteralPath $mediaPath -File -Recurse | Select-Object -First 1
+          if (-not $file) { throw 'Thu muc survey-media khong con file sau deploy.' }
+          Write-Host 'Survey media directory exists and contains files.'
+
+      - name: Check local API health
+        id: local_health
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $uri = "http://localhost:$($env:PORT)/api/health"
+          for ($attempt = 1; $attempt -le 3; $attempt++) {
+            try {
+              $response = Invoke-WebRequest -Uri $uri -UseBasicParsing -TimeoutSec 30
+              $body = $response.Content | ConvertFrom-Json
+              if ($response.StatusCode -ne 200 -or $body.ok -isnot [bool] -or $body.ok -ne $true) {
+                throw 'Expected HTTP 200 and JSON ok=true.'
+              }
+              Write-Host 'Local API health: HTTP 200, ok=true.'
+              break
+            } catch {
+              if ($attempt -eq 3) { throw }
+              Write-Warning "Local health attempt $attempt failed; retrying in 5 seconds."
+              Start-Sleep -Seconds 5
+            }
+          }
+
+      - name: Check public pages
+        id: public_health
+        run: |
+          $ErrorActionPreference = 'Stop'
+          foreach ($path in @('/', '/khao-sat.html')) {
+            $uri = "$($env:PUBLIC_URL)$path"
+            $response = Invoke-WebRequest -Uri $uri -UseBasicParsing -TimeoutSec 30
+            if ($response.StatusCode -ne 200) { throw "Public health failed: $uri" }
+            Write-Host "Public health: $uri returned HTTP 200."
+          }
+
+      - name: Write deployment summary
+        if: ${{ always() }}
+        env:
+          LOCAL_HEALTH_RESULT: ${{ steps.local_health.outcome }}
+          PUBLIC_HEALTH_RESULT: ${{ steps.public_health.outcome }}
+          DEPLOY_RESULT: ${{ job.status }}
+        run: |
+          $finished = [DateTime]::UtcNow
+          $duration = 'Unavailable'
+          if ($env:DEPLOY_STARTED_AT) {
+            $duration = '{0:N1} seconds' -f ($finished - [DateTime]::Parse($env:DEPLOY_STARTED_AT).ToUniversalTime()).TotalSeconds
+          }
+          @"
+          ## Demo server deployment
+          - Result: $env:DEPLOY_RESULT
+          - Site: $env:SITE_NAME
+          - Port: $env:PORT
+          - Publish directory: $env:PUBLISH_PATH
+          - Local API health: $env:LOCAL_HEALTH_RESULT
+          - Public health ($env:PUBLIC_URL/ and /khao-sat.html): $env:PUBLIC_HEALTH_RESULT
+          - Started (UTC): $env:DEPLOY_STARTED_AT
+          - Finished (UTC): $($finished.ToString('o'))
+          - Duration: $duration
+          "@ | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Encoding utf8 -Append
