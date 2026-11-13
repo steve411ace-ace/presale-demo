@@ -23,7 +23,9 @@ Import-Module WebAdministration -ErrorAction Stop
 if (Test-Path "IIS:\Sites\$SiteName") { Stop-Website -Name $SiteName -ErrorAction SilentlyContinue }
 if (Test-Path "IIS:\AppPools\$SiteName") { Stop-WebAppPool -Name $SiteName -ErrorAction SilentlyContinue }
 # Publish (overwrites this site's folder only).
+Write-Host "dotnet publish `"$PSScriptRoot\PresalesDemo.csproj`" -c Release -o `"$PublishPath`""
 dotnet publish "$PSScriptRoot\PresalesDemo.csproj" -c Release -o $PublishPath
+if ($LASTEXITCODE -ne 0) { throw "dotnet publish failed with exit code $LASTEXITCODE" }
 if ($ConnectionString) {
   $cfg = Join-Path $PublishPath "appsettings.json"
   $json = Get-Content $cfg -Raw | ConvertFrom-Json
