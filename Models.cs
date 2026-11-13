@@ -189,7 +189,7 @@ public class SurveyResponse
     public string QuestionsJson { get; set; } = "[]";
     public int? ProfileId { get; set; }
 }
-public record SurveySubmitDto(Dictionary<string, System.Text.Json.JsonElement>? Answers, string? UploadToken);
+public record SurveySubmitDto(Dictionary<string, System.Text.Json.JsonElement>? Answers, string? UploadToken, string? IndustryOther = null);
 public record SurveyField(string Key, string Label, string Type, string Placeholder, bool Required);
 public record SurveyOption(string Text, string? Icon = null);
 

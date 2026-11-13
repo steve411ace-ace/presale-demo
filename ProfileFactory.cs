@@ -19,10 +19,17 @@ public static class ProfileFactory
         // before any demo happened. Template content (Discovery, priorities, scenarios, Fit-Gap) is still copied;
         // only the score and the template's dated actions/follow-ups are NOT carried over. Duplicate keeps copying
         // (that route is intentionally a copy of an existing profile).
-        db.Scorecards.Add(new Scorecard { ProfileId = p.Id });
         foreach (var x in await db.ChecklistItems.Where(x => x.ProfileId == tpl.Id).ToListAsync()) db.ChecklistItems.Add(new ChecklistItem { ProfileId = p.Id, Group = x.Group, Title = x.Title, IsDone = false, IsOneNowMandatory = x.IsOneNowMandatory, SortOrder = x.SortOrder });
-        await db.SaveChangesAsync();
     }
+    else
+    {
+        // No industry template: start with the shared preparation checklist only.
+        var titles = SeedData.ChecklistTitles();
+        for (var i = 0; i < titles.Length; i++)
+            db.ChecklistItems.Add(new ChecklistItem { ProfileId = p.Id, Group = SeedData.ChecklistGroups[Math.Min(i / 3, SeedData.ChecklistGroups.Length - 1)], Title = titles[i], SortOrder = i, IsOneNowMandatory = titles[i].StartsWith("[OneNow bắt buộc]") });
+    }
+    db.Scorecards.Add(new Scorecard { ProfileId = p.Id });
+    await db.SaveChangesAsync();
     return p;
  }
 }

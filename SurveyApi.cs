@@ -282,7 +282,13 @@ public static class SurveyApi
         string Contact(string key)=>answers.TryGetValue("1",out var g) && g.ValueKind==JsonValueKind.Object && g.TryGetProperty(key,out var v)?Text(v):"";
         var company=Contact("companyName");var industry=Get(2);
         if(string.IsNullOrWhiteSpace(company) || company.Length>200 || Contact("contactName")=="" || Contact("contactEmail")=="" || Get(10)=="")return Results.BadRequest("Anh/chị vui lòng nhập đủ liên hệ, tên công ty (tối đa 200 ký tự) và 3 điều muốn thấy.");
-        if(industry is not ("Logistic" or "FnB" or "Hotel" or "Sản xuất"))return Results.BadRequest("Anh/chị vui lòng chọn 1 trong 4 ngành Logistic, FnB, Hotel, Sản xuất để chuẩn bị demo; ngành Khác chưa được hỗ trợ.");
+        if(industry is not ("Logistic" or "FnB" or "Hotel" or "Sản xuất" or "Khác"))return Results.BadRequest("Anh/chị vui lòng chọn ngành của công ty.");
+        if(industry=="Khác") {
+            var industryOther=(dto.IndustryOther??"").Trim();
+            if(industryOther.Length<2 || !Regex.IsMatch(industryOther,@"\p{L}"))return Results.BadRequest(new{message="Anh/chị vui lòng nhập ngành của công ty (ít nhất 2 ký tự và có ít nhất 1 chữ cái).",questionId=2});
+            // Metadata is added only after checking question IDs, never accepted as an answer key.
+            answers["industryOther"]=JsonSerializer.SerializeToElement(industryOther,Json);
+        }
         // Serializable transaction prevents two concurrent submissions creating duplicate company profiles.
         await using var tx=await db.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable);
         var profile=await db.Profiles.FirstOrDefaultAsync(p=>p.Name.ToLower()==company.ToLower());var duplicate=profile!=null;

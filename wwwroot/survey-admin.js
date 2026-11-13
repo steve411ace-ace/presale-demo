@@ -23,7 +23,9 @@ async function refresh(){
  try{
   const s=await api('/api/profiles/'+p._serverId+'/survey');if(request!==summaryRequest||activeProfile()?._serverId!==p._serverId)return;
   const pain=parse(s.painPointsJson).join(', ');
-  const fields=[['Tên công ty',s.companyName],['Ngành',s.industry],['Người liên hệ',[s.contactName,s.role].filter(Boolean).join(' — ')],['Email liên hệ',s.contactEmail],['Quy mô nhân sự',s.employeeBucket],['Số địa điểm / chi nhánh',s.locationsBucket],['Hệ thống hiện tại',s.currentSystem],['Thời gian áp dụng dự kiến',s.applyTimeline],['Đau nhất đã chọn',pain],['Ca làm việc',s.shiftType],['Người quyết định cuối',s.decisionMaker],['3 điều muốn thấy trong demo',s.demoMustSee]];
+  const industryOther=JSON.parse(s.answersJson||'{}').industryOther;
+  const industry=s.industry==='Khác'&&industryOther?s.industry+' ('+industryOther+')':s.industry;
+  const fields=[['Tên công ty',s.companyName],['Ngành',industry],['Người liên hệ',[s.contactName,s.role].filter(Boolean).join(' — ')],['Email liên hệ',s.contactEmail],['Quy mô nhân sự',s.employeeBucket],['Số địa điểm / chi nhánh',s.locationsBucket],['Hệ thống hiện tại',s.currentSystem],['Thời gian áp dụng dự kiến',s.applyTimeline],['Đau nhất đã chọn',pain],['Ca làm việc',s.shiftType],['Người quyết định cuối',s.decisionMaker],['3 điều muốn thấy trong demo',s.demoMustSee]];
   box.innerHTML='<h3>Thông tin từ khảo sát trước demo</h3><span class="survey-badge">Có câu trả lời khảo sát</span><dl>'+fields.map(([label,value])=>'<dt>'+e(label)+'</dt><dd>'+e(value||'Chưa trả lời')+'</dd>').join('')+'</dl><div class="actions"><button class="btn ghost small" id="viewSurvey">Xem câu trả lời</button> <button class="btn ghost small" id="allSurvey">Xem toàn bộ câu trả lời khảo sát</button> <button class="btn small" id="copyProfileSurvey">Sao chép link hồ sơ</button></div>';
   box.hidden=false;document.getElementById('viewSurvey').onclick=document.getElementById('allSurvey').onclick=()=>showAnswers(s);document.getElementById('copyProfileSurvey').onclick=()=>copy('/?profile='+p._serverId);
  }catch(err){if(err.status!==404&&request===summaryRequest)toast('Chưa tải được câu trả lời khảo sát.');}
